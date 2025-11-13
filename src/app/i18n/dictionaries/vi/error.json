@@ -1,0 +1,14 @@
+{
+  "title": "Lỗi: {errorName}",
+  "message": "Chi tiết lỗi: {errorMessage}\n\nVui lòng thử làm mới trang hoặc quay lại sau.",
+  "retry": "Thử lại",
+  "titleView": "Đã xảy ra lỗi",
+  "messageView": "Rất tiếc, đã xảy ra lỗi khi xử lý yêu cầu của bạn.",
+  "systemError": "Lỗi hệ thống: {errorName}",
+  "validation": {
+    "required": "Trường này là bắt buộc",
+    "invalidEmail": "Email không hợp lệ",
+    "passwordMin": "Mật khẩu phải có ít nhất 6 ký tự",
+    "somethingWentWrong": "Đã xảy ra lỗi, vui lòng thử lại sau"
+  }
+}

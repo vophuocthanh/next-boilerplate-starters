@@ -1,0 +1,45 @@
+{
+  "dashboard": "Dashboard",
+  "users": "Users",
+  "settings": "Settings",
+  "search": "Search",
+  "notifications": "Notifications",
+  "logout": "Logout",
+  "totalUsers": "Total Users",
+  "activeUsers": "Active Users",
+  "revenue": "Revenue",
+  "conversion": "Conversion Rate",
+  "recentActivity": "Recent Activity",
+  "action": "Performed action #{id}",
+  "timeAgo": "minutes ago",
+  "menu": {
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "users": "Users",
+    "userList": "User List",
+    "userRoles": "User Roles",
+    "userPermissions": "Permissions",
+    "products": "Products",
+    "productList": "Product List",
+    "categories": "Categories",
+    "inventory": "Inventory",
+    "orders": "Orders",
+    "reports": "Reports",
+    "salesReport": "Sales Report",
+    "userReport": "User Report",
+    "settings": "Settings",
+    "generalSettings": "General",
+    "security": "Security",
+    "profile": "Profile"
+  },
+  "sidebar": {
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
+  },
+  "topbar": {
+    "search": "Search...",
+    "viewProfile": "View Profile",
+    "account": "Account Settings",
+    "logout": "Logout"
+  }
+}

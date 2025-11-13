@@ -1,0 +1,95 @@
+{
+  "hero": {
+    "introducing": "Built for Web3 & Blockchain",
+    "title": "Next-Gen Boilerplate for Decentralized Applications",
+    "description": "Power your Web3 projects with Next.js 15, TypeScript, and cutting-edge blockchain tools. Build faster, scale smarter, deploy seamlessly.",
+    "getStarted": "Start Building",
+    "viewDocs": "View Documentation",
+    "github": "View on GitHub"
+  },
+  "features": {
+    "title": "Key Features",
+    "subtitle": "Modern toolkit to build professional web applications",
+    "viewAll": "View all features",
+    "items": {
+      "performance": {
+        "title": "High Performance",
+        "description": "Optimized performance with App Router, streaming SSR and intelligent caching."
+      },
+      "multilingual": {
+        "title": "Multilingual",
+        "description": "Full multilingual support with next-intl, seamlessly switch between languages."
+      },
+      "typescript": {
+        "title": "TypeScript",
+        "description": "Safer development with TypeScript, reducing errors and improving the development experience."
+      },
+      "tailwind": {
+        "title": "TailwindCSS",
+        "description": "Modern design with TailwindCSS, easily customize and develop interfaces."
+      },
+      "quality": {
+        "title": "Quality Assurance",
+        "description": "ESLint, Prettier and code quality tools integrated out of the box."
+      },
+      "api": {
+        "title": "API Integration",
+        "description": "Easy integration with external APIs, convenient data handling."
+      }
+    }
+  },
+  "testimonials": {
+    "title": "What our customers say",
+    "subtitle": "Discover the experiences of customers who have used our boilerplate",
+    "items": {
+      "1": {
+        "content": "This boilerplate helped us build web applications 60% faster than before. The multilingual features are especially useful for our global project.",
+        "author": "Alex Nguyen",
+        "role": "CTO",
+        "company": "TechVision"
+      },
+      "2": {
+        "content": "I've tried many different boilerplates, but this is the best one I've ever used. Clean structure, excellent performance and clear documentation.",
+        "author": "Sarah Johnson",
+        "role": "Frontend Developer",
+        "company": "Innovate Solutions"
+      },
+      "3": {
+        "content": "The multilingual implementation is what impressed me the most. Easy to extend and customize for different projects.",
+        "author": "David Park",
+        "role": "Software Engineer",
+        "company": "GlobalTech"
+      },
+      "4": {
+        "content": "Next.js 14 combined with TailwindCSS in this boilerplate creates an excellent development experience. We've reduced development time by 40%.",
+        "author": "Emily Chen",
+        "role": "UI/UX Team Lead",
+        "company": "DesignHub"
+      }
+    }
+  },
+  "cta": {
+    "title": "Start your project today",
+    "description": "Build modern, performance-optimized and easily scalable web applications.",
+    "createAccount": "Create free account",
+    "contactSupport": "Contact support team"
+  },
+  "footer": {
+    "description": "Build modern web applications with Next.js, TypeScript, and TailwindCSS.",
+    "product": "Product",
+    "features": "Features",
+    "pricing": "Pricing",
+    "documentation": "Documentation",
+    "guides": "Guides",
+    "company": "Company",
+    "about": "About",
+    "blog": "Blog",
+    "careers": "Careers",
+    "press": "Press",
+    "contact": "Contact",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "copyright": "All rights reserved."
+  }
+}

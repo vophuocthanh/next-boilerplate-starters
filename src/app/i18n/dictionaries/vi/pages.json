@@ -1,0 +1,81 @@
+{
+  "about": {
+    "title": "Về chúng tôi",
+    "subtitle": "Tìm hiểu thêm về đội ngũ và sứ mệnh của chúng tôi",
+    "mission": {
+      "title": "Sứ mệnh của chúng tôi",
+      "description1": "Chúng tôi cam kết tạo ra các giải pháp phần mềm hiện đại, hiệu suất cao và dễ sử dụng. Boilerplate Next.js của chúng tôi được thiết kế để giúp các nhà phát triển xây dựng ứng dụng web tốt hơn, nhanh hơn.",
+      "description2": "Với hơn 5 năm kinh nghiệm trong lĩnh vực phát triển web, chúng tôi hiểu những thách thức mà các nhà phát triển phải đối mặt hàng ngày và chúng tôi đang làm việc không ngừng để giải quyết những thách thức đó."
+    },
+    "team": {
+      "title": "Đội ngũ của chúng tôi",
+      "members": {
+        "ceo": "Giám đốc điều hành",
+        "cto": "Giám đốc kỹ thuật",
+        "productDirector": "Giám đốc sản phẩm"
+      }
+    },
+    "values": {
+      "title": "Giá trị cốt lõi",
+      "items": {
+        "innovation": {
+          "title": "Đổi mới",
+          "description": "Luôn tìm kiếm những giải pháp sáng tạo cho các vấn đề phức tạp."
+        },
+        "quality": {
+          "title": "Chất lượng",
+          "description": "Cam kết tạo ra sản phẩm đạt tiêu chuẩn cao nhất."
+        },
+        "community": {
+          "title": "Cộng đồng",
+          "description": "Tích cực đóng góp cho cộng đồng nguồn mở."
+        },
+        "collaboration": {
+          "title": "Hợp tác",
+          "description": "Làm việc cùng nhau để đạt được nhiều hơn là làm việc một mình."
+        },
+        "respect": {
+          "title": "Tôn trọng",
+          "description": "Đối xử với mọi người bằng sự tôn trọng và phẩm giá."
+        },
+        "adaptability": {
+          "title": "Linh hoạt",
+          "description": "Sẵn sàng thích nghi với công nghệ mới và thay đổi."
+        }
+      }
+    }
+  },
+  "contact": {
+    "title": "Liên hệ với chúng tôi",
+    "subtitle": "Bạn có câu hỏi hoặc cần trợ giúp? Hãy liên hệ với chúng tôi!",
+    "info": {
+      "title": "Thông tin liên hệ",
+      "address": {
+        "label": "Địa chỉ",
+        "value": "123 Đường Lê Lợi, Quận 1, TP. Hồ Chí Minh, Việt Nam"
+      },
+      "phone": {
+        "label": "Điện thoại"
+      }
+    },
+    "form": {
+      "title": "Gửi tin nhắn",
+      "name": {
+        "label": "Họ tên",
+        "placeholder": "Nhập họ tên của bạn"
+      },
+      "email": {
+        "placeholder": "Nhập email của bạn"
+      },
+      "subject": {
+        "label": "Tiêu đề",
+        "placeholder": "Nhập tiêu đề"
+      },
+      "message": {
+        "label": "Nội dung",
+        "placeholder": "Nhập nội dung tin nhắn"
+      },
+      "submit": "Gửi tin nhắn"
+    }
+  }
+}

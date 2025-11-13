@@ -1,0 +1,81 @@
+{
+  "about": {
+    "title": "About Us",
+    "subtitle": "Learn more about our team and mission",
+    "mission": {
+      "title": "Our Mission",
+      "description1": "We are committed to creating modern, high-performance and user-friendly software solutions. Our Next.js boilerplate is designed to help developers build better web applications, faster.",
+      "description2": "With over 5 years of experience in web development, we understand the challenges developers face daily and we are working tirelessly to address those challenges."
+    },
+    "team": {
+      "title": "Our Team",
+      "members": {
+        "ceo": "Chief Executive Officer",
+        "cto": "Chief Technology Officer",
+        "productDirector": "Product Director"
+      }
+    },
+    "values": {
+      "title": "Core Values",
+      "items": {
+        "innovation": {
+          "title": "Innovation",
+          "description": "Always seeking creative solutions to complex problems."
+        },
+        "quality": {
+          "title": "Quality",
+          "description": "Committed to creating products of the highest standard."
+        },
+        "community": {
+          "title": "Community",
+          "description": "Actively contributing to the open-source community."
+        },
+        "collaboration": {
+          "title": "Collaboration",
+          "description": "Working together to achieve more than working alone."
+        },
+        "respect": {
+          "title": "Respect",
+          "description": "Treating everyone with respect and dignity."
+        },
+        "adaptability": {
+          "title": "Adaptability",
+          "description": "Ready to adapt to new technologies and changes."
+        }
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Have questions or need help? Get in touch with us!",
+    "info": {
+      "title": "Contact Information",
+      "address": {
+        "label": "Address",
+        "value": "123 Le Loi Street, District 1, Ho Chi Minh City, Vietnam"
+      },
+      "phone": {
+        "label": "Phone"
+      }
+    },
+    "form": {
+      "title": "Send Message",
+      "name": {
+        "label": "Full Name",
+        "placeholder": "Enter your full name"
+      },
+      "email": {
+        "placeholder": "Enter your email"
+      },
+      "subject": {
+        "label": "Subject",
+        "placeholder": "Enter subject"
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Enter your message"
+      },
+      "submit": "Send Message"
+    }
+  }
+}

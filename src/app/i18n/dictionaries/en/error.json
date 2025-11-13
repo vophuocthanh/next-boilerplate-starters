@@ -1,0 +1,14 @@
+{
+  "title": "Error: {errorName}",
+  "message": "Error details: {errorMessage}\n\nPlease try refreshing the page or come back later.",
+  "retry": "Try again",
+  "titleView": "An error occurred",
+  "messageView": "Sorry, an error occurred while processing your request. Please try again later.",
+  "systemError": "System error: {errorName}",
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordMin": "Password must be at least 6 characters",
+    "somethingWentWrong": "Something went wrong, please try again later"
+  }
+}

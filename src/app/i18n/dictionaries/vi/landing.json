@@ -1,0 +1,95 @@
+{
+  "hero": {
+    "introducing": "Xây dựng cho Web3 & Blockchain",
+    "title": "Boilerplate Thế Hệ Mới cho Ứng Dụng Phi Tập Trung",
+    "description": "Nâng tầm dự án Web3 của bạn với Next.js 15, TypeScript và các công cụ blockchain tiên tiến. Xây dựng nhanh hơn, mở rộng thông minh hơn, triển khai mượt mà.",
+    "getStarted": "Bắt Đầu Xây Dựng",
+    "viewDocs": "Xem Tài Liệu",
+    "github": "Xem trên GitHub"
+  },
+  "features": {
+    "title": "Tính năng nổi bật",
+    "subtitle": "Bộ công cụ hiện đại để xây dựng ứng dụng web chuyên nghiệp",
+    "viewAll": "Xem tất cả tính năng",
+    "items": {
+      "performance": {
+        "title": "Hiệu suất cao",
+        "description": "Tối ưu hóa hiệu suất với App Router, streaming SSR và tính năng caching thông minh."
+      },
+      "multilingual": {
+        "title": "Đa ngôn ngữ",
+        "description": "Hỗ trợ đa ngôn ngữ đầy đủ với next-intl, chuyển đổi liền mạch giữa các ngôn ngữ."
+      },
+      "typescript": {
+        "title": "TypeScript",
+        "description": "Phát triển an toàn hơn với TypeScript, giảm lỗi và cải thiện trải nghiệm phát triển."
+      },
+      "tailwind": {
+        "title": "TailwindCSS",
+        "description": "Thiết kế hiện đại với TailwindCSS, dễ dàng tùy chỉnh và phát triển giao diện."
+      },
+      "quality": {
+        "title": "Kiểm tra chất lượng",
+        "description": "ESLint, Prettier và các công cụ kiểm tra chất lượng mã nguồn được tích hợp sẵn."
+      },
+      "api": {
+        "title": "API Tích hợp",
+        "description": "Tích hợp dễ dàng với các API bên ngoài, xử lý dữ liệu thuận tiện."
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Khách hàng nói gì về chúng tôi",
+    "subtitle": "Khám phá trải nghiệm của những khách hàng đã sử dụng boilerplate của chúng tôi",
+    "items": {
+      "1": {
+        "content": "Boilerplate này giúp chúng tôi xây dựng ứng dụng web nhanh chóng hơn 60% so với trước đây. Các tính năng hỗ trợ đa ngôn ngữ đặc biệt hữu ích cho dự án toàn cầu của chúng tôi.",
+        "author": "Alex Nguyen",
+        "role": "Giám đốc kỹ thuật",
+        "company": "TechVision"
+      },
+      "2": {
+        "content": "Tôi đã thử nhiều boilerplate khác nhau, nhưng đây là cái tốt nhất tôi từng sử dụng. Cấu trúc sạch sẽ, hiệu suất tuyệt vời và tài liệu rõ ràng.",
+        "author": "Sarah Johnson",
+        "role": "Nhà phát triển Frontend",
+        "company": "Innovate Solutions"
+      },
+      "3": {
+        "content": "Việc triển khai đa ngôn ngữ là điều làm tôi ấn tượng nhất. Dễ dàng mở rộng và tùy chỉnh cho các dự án khác nhau.",
+        "author": "David Park",
+        "role": "Kỹ sư phần mềm",
+        "company": "GlobalTech"
+      },
+      "4": {
+        "content": "Next.js 14 kết hợp với TailwindCSS trong boilerplate này tạo ra trải nghiệm phát triển tuyệt vời. Chúng tôi đã giảm 40% thời gian phát triển.",
+        "author": "Emily Chen",
+        "role": "Trưởng nhóm UI/UX",
+        "company": "DesignHub"
+      }
+    }
+  },
+  "cta": {
+    "title": "Bắt đầu dự án của bạn ngay hôm nay",
+    "description": "Xây dựng ứng dụng web hiện đại, tối ưu hiệu suất và dễ dàng mở rộng.",
+    "createAccount": "Tạo tài khoản miễn phí",
+    "contactSupport": "Liên hệ với nhóm hỗ trợ"
+  },
+  "footer": {
+    "description": "Xây dựng ứng dụng web hiện đại với Next.js, TypeScript, và TailwindCSS.",
+    "product": "Sản phẩm",
+    "features": "Tính năng",
+    "pricing": "Bảng giá",
+    "documentation": "Tài liệu",
+    "guides": "Hướng dẫn",
+    "company": "Công ty",
+    "about": "Giới thiệu",
+    "blog": "Blog",
+    "careers": "Tuyển dụng",
+    "press": "Báo chí",
+    "contact": "Liên hệ",
+    "termsOfService": "Điều khoản sử dụng",
+    "privacyPolicy": "Chính sách bảo mật",
+    "cookiePolicy": "Chính sách Cookie",
+    "copyright": "Đã đăng ký bản quyền."
+  }
+}

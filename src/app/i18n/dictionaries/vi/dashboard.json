@@ -1,0 +1,45 @@
+{
+  "dashboard": "Bảng điều khiển",
+  "users": "Người dùng",
+  "settings": "Cài đặt",
+  "search": "Tìm kiếm",
+  "notifications": "Thông báo",
+  "logout": "Đăng xuất",
+  "totalUsers": "Tổng số người dùng",
+  "activeUsers": "Người dùng hoạt động",
+  "revenue": "Doanh thu",
+  "conversion": "Tỷ lệ chuyển đổi",
+  "recentActivity": "Hoạt động gần đây",
+  "action": "Đã thực hiện hành động #{id}",
+  "timeAgo": "phút trước",
+  "menu": {
+    "dashboard": "Bảng điều khiển",
+    "analytics": "Phân tích",
+    "users": "Người dùng",
+    "userList": "Danh sách người dùng",
+    "userRoles": "Vai trò",
+    "userPermissions": "Quyền hạn",
+    "products": "Sản phẩm",
+    "productList": "Danh sách sản phẩm",
+    "categories": "Danh mục",
+    "inventory": "Kho hàng",
+    "orders": "Đơn hàng",
+    "reports": "Báo cáo",
+    "salesReport": "Báo cáo bán hàng",
+    "userReport": "Báo cáo người dùng",
+    "settings": "Cài đặt",
+    "generalSettings": "Chung",
+    "security": "Bảo mật",
+    "profile": "Hồ sơ"
+  },
+  "sidebar": {
+    "collapse": "Thu gọn thanh bên",
+    "expand": "Mở rộng thanh bên"
+  },
+  "topbar": {
+    "search": "Tìm kiếm...",
+    "viewProfile": "Xem hồ sơ",
+    "account": "Cài đặt tài khoản",
+    "logout": "Đăng xuất"
+  }
+}
