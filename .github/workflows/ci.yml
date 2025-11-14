@@ -31,7 +31,9 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          tags: ${{ steps.next-image.outputs.short_name }}
+          tags: |
+            vophuocthanh/next-boilerplate-starters:latest
+            vophuocthanh/next-boilerplate-starters:${{ steps.next-image.outputs.short_name }}
           push: true
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
