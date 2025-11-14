@@ -30,11 +30,10 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          push: true
           file: Dockerfile
           tags: |
             vophuocthanh/next-boilerplate-starters:latest
             vophuocthanh/next-boilerplate-starters:${{ steps.next-image.outputs.short_name }}
-          push: true
-          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
