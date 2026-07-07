@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Boilerplate
 
-## Getting Started
+A production-ready Next.js starter with App Router, i18n, authentication, and a batteries-included tooling setup — so you can start building features instead of wiring infrastructure.
 
-First, run the development server:
+## ✨ Features
+
+- **Next.js 16** with App Router, React 19 and Turbopack
+- **TypeScript** with strict, path-aliased imports (`@/*`)
+- **Tailwind CSS v4** + [shadcn/ui](https://ui.shadcn.com) (New York style, Lucide icons)
+- **Internationalization** via [next-intl](https://next-intl-docs.vercel.app) — locale-prefixed routes (`vi`, `en`)
+- **Data fetching** with TanStack Query + a typed Axios HTTP client
+- **Auth flow** with access/refresh tokens, request queueing and auto-retry built in
+- **Forms & validation** with React Hook Form + Zod
+- **State management** with Zustand
+- **Theming** (light/dark) with next-themes
+- **Error handling** — error boundaries, custom error and `not-found` pages
+- **DX tooling** — ESLint, Prettier, Husky, lint-staged, Commitlint (Conventional Commits)
+- **Docker** image + GitHub Actions CI
+
+## 🧰 Tech Stack
+
+| Area      | Choice                                          |
+| --------- | ----------------------------------------------- |
+| Framework | Next.js 16, React 19                            |
+| Language  | TypeScript 5                                    |
+| Styling   | Tailwind CSS v4, shadcn/ui, tailwind-merge, CVA |
+| i18n      | next-intl                                       |
+| Data      | TanStack Query, Axios                           |
+| State     | Zustand                                         |
+| Forms     | React Hook Form, Zod                            |
+| Animation | Framer Motion                                   |
+| Utilities | Lodash, Day.js, React Toastify                  |
+
+## 🚀 Getting Started
+
+**Requirements:** Node.js 20+ and [pnpm](https://pnpm.io) 11+.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# 1. Install dependencies
+pnpm install
+
+# 2. Configure environment
+# create .env.local and set the variables listed below
+
+# 3. Start the dev server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:4040](http://localhost:4040) — the app redirects to the default locale (`/vi`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable              | Description                       |
+| --------------------- | --------------------------------- |
+| `NEXT_PUBLIC_API_URL` | Base URL of the backend REST API. |
 
-## Learn More
+## 📜 Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command      | Description                                |
+| ------------ | ------------------------------------------ |
+| `pnpm dev`   | Start the dev server on port `4040`.       |
+| `pnpm build` | Build the production bundle.               |
+| `pnpm start` | Serve the production build on port `4040`. |
+| `pnpm lint`  | Run ESLint.                                |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/
+│   ├── [locale]/           # Localized routes
+│   │   ├── (client)/       # Public-facing pages + landing sections
+│   │   └── (admin)/        # Dashboard, analytics, user management
+│   ├── i18n/               # next-intl config, dictionaries (vi/en), loaders
+│   ├── layout.tsx          # Root layout & providers
+│   └── globals.css
+├── components/
+│   ├── ui/                 # shadcn/ui primitives + error UI
+│   ├── layout/             # Admin shell (sidebar, header)
+│   └── providers/          # Query, theme & error-boundary providers
+├── core/
+│   ├── service/            # HTTP client & API services
+│   ├── store/              # Zustand stores
+│   ├── constant/           # Routes, HTTP status codes
+│   ├── helpers/            # Formatters, validators, utilities
+│   └── utils/              # Local storage helpers
+├── hooks/                  # Reusable React hooks
+├── model/                  # Shared types & interfaces
+├── lib/                    # Shared low-level utils (cn, etc.)
+└── proxy.ts                # Locale detection & routing (Next.js proxy)
+```
 
-## Deploy on Vercel
+## 🌐 Internationalization
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Locales live in `src/app/i18n/dictionaries/{locale}/*.json` and are namespaced (`common`, `auth`, `dashboard`, `landing`, …). Every route is prefixed with its locale (`localePrefix: "always"`), and `src/proxy.ts` handles detection and redirects.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To add a language, extend `locales` in [`src/app/i18n/config/settings.ts`](src/app/i18n/config/settings.ts) and add the matching dictionary folder.
+
+## 🌍 HTTP & Auth
+
+`src/core/service/http-client.ts` wraps Axios with:
+
+- Automatic `Authorization` header injection
+- Transparent access-token refresh with request queueing on `401`
+- Exponential-backoff retries on network timeouts
+- Normalized error types (`HttpError`, `UnprocessableEntityError`)
+
+Use the shared `httpClient` (`get` / `post` / `put` / `patch` / `delete`) for all API calls.
+
+## 🐳 Docker
+
+```bash
+docker build -t next-boilerplate .
+docker run -p 4040:4040 next-boilerplate
+```
+
+Pushes to `develop` are built and published to Docker Hub via [GitHub Actions](.github/workflows/ci.yml).
+
+## 🤝 Contributing
+
+Commits follow the [Conventional Commits](https://www.conventionalcommits.org) spec (enforced by Commitlint). Husky runs lint-staged on every commit to format and lint changed files.
+
+Use the provided [issue templates](.github/ISSUE_TEMPLATE) and [pull request template](.github/pull_request_template.md) when opening issues or PRs.

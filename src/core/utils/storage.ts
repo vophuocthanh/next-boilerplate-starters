@@ -1,3 +1,8 @@
+import {
+  COOKIE_LOCALE,
+  COOKIE_LOCALE_MAX_AGE,
+  COOKIE_LOCALE_SAME_SITE,
+} from "@/core/helpers/consts";
 import type { UserResponseType } from "@/model/interface/user.interface";
 
 // Constants
@@ -82,6 +87,11 @@ export const getUserFromLocalStorage = (): UserResponseType | null => {
 
 export const setUserToLS = (user: UserResponseType): void => {
   setItemToLS(STORAGE_KEYS.USER, user);
+};
+
+// Cookie management
+export const setLocaleCookie = (locale: string): void => {
+  document.cookie = `${COOKIE_LOCALE}=${locale}; path=/; max-age=${COOKIE_LOCALE_MAX_AGE}; SameSite=${COOKIE_LOCALE_SAME_SITE}`;
 };
 
 // Session management

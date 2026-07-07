@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 
 import { AnimatedBackground } from "@/components/ui/error/animated-background";
 import {
@@ -12,6 +11,7 @@ import { ErrorContent } from "@/components/ui/error/error-content";
 import { AnimatedErrorIcon } from "@/components/ui/error/error-icon";
 import { ErrorId } from "@/components/ui/error/error-id";
 import { RetryButton } from "@/components/ui/error/retry-button";
+import { useMounted } from "@/hooks/use-mounted";
 
 type AppErrorProps = {
   error: Error & { digest?: string };
@@ -28,14 +28,9 @@ export const AppError = ({
   message = "Rất tiếc, đã xảy ra lỗi khi xử lý yêu cầu của bạn.\nVui lòng thử làm mới trang hoặc quay lại sau.",
   retryLabel = "Thử lại",
 }: AppErrorProps) => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const safeError = error || new Error("Unknown error");
 
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, [safeError]);
+  const mounted = useMounted();
 
   if (!mounted) return null;
 

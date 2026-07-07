@@ -3,16 +3,11 @@
 import { motion } from "framer-motion";
 import { Home } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-
 import { Button } from "@/components/ui/button";
+import { useMounted } from "@/hooks/use-mounted";
 
 export default function NotFoundApp() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useMounted();
 
   if (!mounted) return null;
 

@@ -6,14 +6,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { locales, type Locale } from "@/app/i18n/config/settings";
-import {
-  COOKIE_LOCALE,
-  COOKIE_LOCALE_MAX_AGE,
-  COOKIE_LOCALE_SAME_SITE,
-} from "@/core/helpers/consts";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { localeLabels } from "./helpers";
 import { ROUTE_CONSTANTS } from "@/core/constant/route";
+import { setLocaleCookie } from "@/core/utils/storage";
 
 export const LanguageSwitcher = () => {
   const locale = useLocale() as Locale;
@@ -24,7 +20,7 @@ export const LanguageSwitcher = () => {
   const ref = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
 
   const handleLanguageChange = (newLocale: Locale) => {
-    document.cookie = `${COOKIE_LOCALE}=${newLocale}; path=/; max-age=${COOKIE_LOCALE_MAX_AGE}; SameSite=${COOKIE_LOCALE_SAME_SITE}`;
+    setLocaleCookie(newLocale);
 
     const segments = pathname.split(ROUTE_CONSTANTS.HOME);
     segments[1] = newLocale as string;
