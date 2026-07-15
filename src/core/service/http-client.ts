@@ -2,34 +2,33 @@ import type {
   AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
-  AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
 import axios, { HttpStatusCode } from "axios";
 
-import { isEqual } from "@/core/configs";
-import { authApi } from "@/core/service/auth.service";
+import { API_URL } from "@/core/configs/env";
 import {
   clearLS,
   getAccessTokenFromLS,
   getRefreshTokenFromLS,
   setAccessTokenToLS,
+  setRefreshTokenToLS,
 } from "@/core/utils/storage";
 import type { LoginResponse } from "@/model/interface/auth.interface";
 
-/**
- * Constants
- */
-const ECONNABORTED = "ECONNABORTED";
 const MAX_RETRY_COUNT = 3;
-const RETRY_DELAY_MS = 1000;
+const RETRY_BASE_DELAY_MS = 500;
 const TIMEOUT_MS = 10000;
 const TOKEN_PREFIX = "Bearer";
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-/**
- * Error types
- */
+/** Transient failures worth retrying: no response at all, or an overloaded upstream. */
+const RETRYABLE_CODES = ["ECONNABORTED", "ETIMEDOUT", "ERR_NETWORK"];
+const RETRYABLE_STATUSES: number[] = [
+  HttpStatusCode.BadGateway,
+  HttpStatusCode.ServiceUnavailable,
+  HttpStatusCode.GatewayTimeout,
+];
+
 export class HttpError extends Error {
   constructor(
     public status: number,
@@ -57,37 +56,35 @@ type UnprocessableEntityErrorPayload = HttpErrorPayload & {
   errors: Record<string, string>;
 };
 
-/**
- * Authentication related types
- */
 type RefreshTokenQueueItem = {
   resolve: (token: string) => void;
   reject: (error: unknown) => void;
 };
 
-/**
- * Extended request config with retry tracking
- */
 type ExtendedInternalAxiosRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
   _retryCount?: number;
 };
 
-/**
- * Runtime constants
- */
 const isClient = typeof window !== "undefined";
 
 /**
- * HTTP Client Class
+ * Bare client used only to renew tokens. It deliberately has no interceptors:
+ * routing the refresh call through the main instance would let a 401 from the
+ * refresh endpoint trigger another refresh, recursing without end.
  */
+const refreshClient = axios.create({
+  baseURL: API_URL,
+  timeout: TIMEOUT_MS,
+  headers: { "Content-Type": "application/json" },
+});
+
 class HttpClient {
   private instance: AxiosInstance;
   private isRefreshing = false;
   private refreshQueue: RefreshTokenQueueItem[] = [];
-  private authService: typeof authApi;
 
-  constructor(baseURL: string = API_URL ?? "") {
+  constructor(baseURL: string = API_URL) {
     this.instance = axios.create({
       baseURL,
       timeout: TIMEOUT_MS,
@@ -96,41 +93,33 @@ class HttpClient {
       },
     });
 
-    this.authService = authApi;
     this.setupInterceptors();
   }
 
   private setupInterceptors(): void {
-    // Request interceptor
     this.instance.interceptors.request.use(
-      (config: InternalAxiosRequestConfig) =>
-        this.handleRequest(config) as InternalAxiosRequestConfig,
+      (config) => this.handleRequest(config),
       (error) => Promise.reject(error),
     );
 
-    // Response interceptor
     this.instance.interceptors.response.use(
-      (response) => this.handleResponse(response),
+      (response) => response,
       async (error: AxiosError) => {
         try {
-          // Handle retry for network errors
           if (this.shouldRetry(error)) {
             return await this.retryRequest(error);
           }
 
-          // Handle auth errors
-          if (this.isUnauthorizedError(error)) {
+          if (error.response?.status === HttpStatusCode.Unauthorized) {
             return await this.handleUnauthorizedError(error);
           }
 
-          // Handle validation errors
-          if (this.isValidationError(error)) {
+          if (error.response?.status === HttpStatusCode.UnprocessableEntity) {
             throw new UnprocessableEntityError(
-              error.response?.data as UnprocessableEntityErrorPayload,
+              error.response.data as UnprocessableEntityErrorPayload,
             );
           }
 
-          // Generic error handling
           throw new HttpError(
             error.response?.status || HttpStatusCode.InternalServerError,
             this.normalizeErrorPayload(error.response?.data),
@@ -142,144 +131,99 @@ class HttpClient {
     );
   }
 
-  private handleRequest(config: AxiosRequestConfig): AxiosRequestConfig {
-    // Ensure baseURL is set
-    if (!config.baseURL) {
-      config.baseURL = API_URL;
-    }
-
-    // Add auth token if available on client
+  private handleRequest(
+    config: InternalAxiosRequestConfig,
+  ): InternalAxiosRequestConfig {
     if (isClient) {
       const accessToken = getAccessTokenFromLS();
       if (accessToken) {
-        config.headers = {
-          ...config.headers,
-          Authorization: `${TOKEN_PREFIX} ${accessToken}`,
-        };
+        // `config.headers` is an AxiosHeaders instance; spreading it into a
+        // plain object would strip the methods axios relies on downstream.
+        config.headers.set("Authorization", `${TOKEN_PREFIX} ${accessToken}`);
       }
     }
 
     return config;
   }
 
-  private handleResponse<T = unknown>(
-    response: AxiosResponse<T>,
-  ): AxiosResponse<T> {
-    if (!isClient) return response;
-
-    const url = response.config.url || "";
-
-    // Handle login response
-    if (url.includes("/api/auth/login")) {
-      const { access_token } = response.data as LoginResponse;
-      setAccessTokenToLS(access_token);
-    }
-    // Handle logout response
-    else if (url.includes("/api/auth/logout")) {
-      clearLS();
-    }
-
-    return response;
-  }
-
   private shouldRetry(error: AxiosError): boolean {
     const config = error.config as
       | ExtendedInternalAxiosRequestConfig
       | undefined;
+    if (!config || (config._retryCount ?? 0) >= MAX_RETRY_COUNT) {
+      return false;
+    }
+
+    const status = error.response?.status;
     return (
-      !!config &&
-      isEqual(error.code, ECONNABORTED) &&
-      (!config._retryCount || config._retryCount < MAX_RETRY_COUNT)
+      (!!error.code && RETRYABLE_CODES.includes(error.code)) ||
+      (!!status && RETRYABLE_STATUSES.includes(status))
     );
   }
 
-  private async retryRequest<T = unknown>(
-    error: AxiosError,
-  ): Promise<AxiosResponse<T>> {
+  private async retryRequest<T = unknown>(error: AxiosError) {
     const config = error.config as ExtendedInternalAxiosRequestConfig;
-    if (!config) {
-      return Promise.reject(error);
-    }
-
     config._retryCount = (config._retryCount || 0) + 1;
 
-    // Exponential backoff
-    const delayMs = RETRY_DELAY_MS * config._retryCount;
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    // Exponential backoff with jitter, so a fleet of clients doesn't
+    // synchronise its retries against a recovering server.
+    const backoff = RETRY_BASE_DELAY_MS * 2 ** (config._retryCount - 1);
+    const jitter = backoff * 0.2 * Math.random();
+    await new Promise((resolve) => setTimeout(resolve, backoff + jitter));
 
     return this.instance<T>(config);
   }
 
-  private isUnauthorizedError(error: AxiosError): boolean {
-    return isEqual(error.response?.status, HttpStatusCode.Unauthorized);
-  }
-
-  private isValidationError(error: AxiosError): boolean {
-    return isEqual(error.response?.status, HttpStatusCode.UnprocessableEntity);
-  }
-
-  private async handleUnauthorizedError<T = unknown>(
-    error: AxiosError,
-  ): Promise<AxiosResponse<T>> {
+  private async handleUnauthorizedError<T = unknown>(error: AxiosError) {
     const originalRequest = error.config as
       | ExtendedInternalAxiosRequestConfig
       | undefined;
 
-    if (!originalRequest) {
-      return Promise.reject(error);
-    }
-
-    // Skip if already retrying
-    if (originalRequest._retry) {
+    if (!originalRequest || originalRequest._retry || !isClient) {
       return Promise.reject(error);
     }
 
     originalRequest._retry = true;
 
-    // If already refreshing, queue this request
     if (this.isRefreshing) {
       return new Promise<string>((resolve, reject) => {
         this.refreshQueue.push({ resolve, reject });
-      })
-        .then((token) => {
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `${TOKEN_PREFIX} ${token}`;
-          }
-          return this.instance<T>(originalRequest);
-        })
-        .catch(() => {
-          return Promise.reject(error);
-        });
+      }).then((token) => {
+        originalRequest.headers.set(
+          "Authorization",
+          `${TOKEN_PREFIX} ${token}`,
+        );
+        return this.instance<T>(originalRequest);
+      });
     }
 
-    // Start refresh token process
     this.isRefreshing = true;
     try {
-      const response = await this.authService.refreshToken(
-        getRefreshTokenFromLS() as string,
-      );
-      const newToken = response.access_token as string;
-
-      // Update token in storage
-      setAccessTokenToLS(newToken);
-
-      // Update request with new token
-      if (originalRequest.headers) {
-        originalRequest.headers.Authorization = `${TOKEN_PREFIX} ${newToken}`;
+      const refreshToken = getRefreshTokenFromLS();
+      if (!refreshToken) {
+        throw new Error("No refresh token available");
       }
 
-      // Process queued requests
-      this.processQueue(newToken);
+      const { data } = await refreshClient.post<LoginResponse>(
+        "/auth/refresh-token",
+        { refresh_token: refreshToken },
+      );
 
-      // Retry the original request
+      setAccessTokenToLS(data.access_token);
+      if (data.refresh_token) {
+        setRefreshTokenToLS(data.refresh_token);
+      }
+
+      originalRequest.headers.set(
+        "Authorization",
+        `${TOKEN_PREFIX} ${data.access_token}`,
+      );
+      this.processQueue(data.access_token);
+
       return this.instance<T>(originalRequest);
     } catch (refreshError) {
-      // Handle refresh token failure
       this.processQueue(null, refreshError);
-
-      // Logout user
-      await this.handleLogout();
-
+      clearLS();
       return Promise.reject(refreshError);
     } finally {
       this.isRefreshing = false;
@@ -287,28 +231,15 @@ class HttpClient {
   }
 
   private processQueue(token: string | null, error?: unknown): void {
+    const queue = this.refreshQueue;
+    this.refreshQueue = [];
+
     if (token) {
-      // Resolve all queued requests with the new token
-      this.refreshQueue.forEach(({ resolve }) => resolve(token));
+      queue.forEach(({ resolve }) => resolve(token));
     } else {
-      // Reject all queued requests
-      this.refreshQueue.forEach(({ reject }) =>
+      queue.forEach(({ reject }) =>
         reject(error || new Error("Failed to refresh token")),
       );
-    }
-
-    // Clear the queue
-    this.refreshQueue = [];
-  }
-
-  private async handleLogout(): Promise<void> {
-    try {
-      await this.authService.logout();
-      clearLS();
-    } catch (error) {
-      console.error("Logout failed:", error);
-    } finally {
-      clearLS();
     }
   }
 
@@ -317,7 +248,6 @@ class HttpClient {
 
     const payload = data as Record<string, unknown>;
 
-    // Standardize message field
     if (payload.msg && !payload.message) {
       payload.message = payload.msg;
     }
@@ -325,9 +255,6 @@ class HttpClient {
     return payload as HttpErrorPayload;
   }
 
-  /**
-   * Public methods for making API requests
-   */
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.instance.get<T>(url, config);
     return response.data;
@@ -365,13 +292,9 @@ class HttpClient {
     return response.data;
   }
 
-  // Access the Axios instance directly if needed
   getAxiosInstance(): AxiosInstance {
     return this.instance;
   }
 }
 
-/**
- * Create a default HttpClient instance
- */
 export const httpClient = new HttpClient();

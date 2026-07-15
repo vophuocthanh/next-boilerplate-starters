@@ -1,4 +1,3 @@
-import { Locale } from "@/app/i18n/config/settings";
 import { Linkedin, Github, Mail, Twitter } from "lucide-react";
 
 export const socialLinks = [
@@ -26,8 +25,3 @@ export const navItems = [
   { key: "about", href: "#about" },
   { key: "contact", href: "#contact" },
 ];
-
-export const localeLabels: Record<Locale, { name: string; flag: string }> = {
-  vi: { name: "Tiếng Việt", flag: "🇻🇳" },
-  en: { name: "English", flag: "🇺🇸" },
-};

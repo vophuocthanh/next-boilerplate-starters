@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Bell, Settings, LogOut, User, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { Search, Bell, Settings, LogOut, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { DashboardTranslations } from "./types";
-import { LanguageSwitcher } from "@/app/[locale]/(client)/_components/language-switcher";
+import { LanguageSwitcher } from "@/components/common/language-switcher";
+import { ThemeToggle } from "@/components/common/theme-toggle";
+import { authApi } from "@/core/service/auth.service";
+import { ROUTE_CONSTANTS } from "@/core/constant/route";
 
 interface HeaderAdminProps {
   translations: DashboardTranslations;
@@ -24,13 +27,18 @@ export const HeaderAdmin = ({
   translations,
   isCollapsed,
 }: HeaderAdminProps) => {
-  const { theme, setTheme } = useTheme();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [hasNotifications] = useState(true);
 
-  const handleLogout = () => console.log("Logout clicked");
-
-  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+  const handleLogout = async () => {
+    try {
+      await authApi.logout();
+    } finally {
+      router.push(ROUTE_CONSTANTS.HOME);
+      router.refresh();
+    }
+  };
 
   return (
     <header
@@ -67,20 +75,9 @@ export const HeaderAdmin = ({
 
         <div className="flex items-center gap-2 shrink-0">
           <LanguageSwitcher />
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label="Toggle theme"
-            title="Toggle theme"
-          >
-            {theme === "dark" ? (
-              <Sun className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-            ) : (
-              <Moon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-            )}
-          </button>
+          <ThemeToggle />
 
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <button
                 className="relative p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -116,7 +113,7 @@ export const HeaderAdmin = ({
           </DropdownMenu>
 
           <div className="relative">
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 p-1.5 pr-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full">
                   <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0">

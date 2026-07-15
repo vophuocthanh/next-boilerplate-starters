@@ -1,8 +1,5 @@
 import type { ProcessedError } from "@/model/interface/error.interface";
 
-/**
- * Processes error object and extracts relevant information
- */
 export const processError = (
   error: Error & { digest?: string },
 ): ProcessedError => {
@@ -17,9 +14,6 @@ export const processError = (
   };
 };
 
-/**
- * Logs error details to console
- */
 export const logErrorDetails = (error: Error & { digest?: string }): void => {
   const { errorName, errorMessage, errorDigest } = processError(error);
 
@@ -30,19 +24,3 @@ export const logErrorDetails = (error: Error & { digest?: string }): void => {
     stack: error?.stack,
   });
 };
-
-/**
- * Creates fallback error messages for Vietnamese locale
- */
-export const getFallbackErrorMessages = (
-  errorName: string,
-  errorMessage: string,
-): {
-  title: string;
-  message: string;
-  retryLabel: string;
-} => ({
-  title: `Lỗi: ${errorName}`,
-  message: `Chi tiết lỗi: ${errorMessage}\n\nVui lòng thử làm mới trang hoặc quay lại sau.`,
-  retryLabel: "Thử lại",
-});

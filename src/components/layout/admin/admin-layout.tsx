@@ -9,21 +9,15 @@ import { cn } from "@/lib/utils";
 interface AdminLayoutProps {
   children: ReactNode;
   translations: DashboardTranslations;
-  locale: string;
 }
 
-export const AdminLayout = ({
-  children,
-  translations,
-  locale,
-}: AdminLayoutProps) => {
+export const AdminLayout = ({ children, translations }: AdminLayoutProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <Sidebar
         translations={translations}
-        locale={locale}
         isCollapsed={isCollapsed}
         onToggleCollapse={setIsCollapsed}
       />

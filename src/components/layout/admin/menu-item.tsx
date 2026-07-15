@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -11,21 +10,21 @@ interface MenuItemProps {
   item: MenuItemType;
   level?: number;
   isCollapsed: boolean;
-  onToggle?: (id: string) => void;
-  isOpen?: boolean;
+  openMenuIds: Set<string>;
+  onToggle: (id: string) => void;
 }
 
 export const MenuItem = ({
   item,
   level = 0,
   isCollapsed,
+  openMenuIds,
   onToggle,
-  isOpen = false,
 }: MenuItemProps) => {
   const pathname = usePathname();
-  const [localOpen, setLocalOpen] = useState(false);
-  const hasChildren = item.children && item.children.length > 0;
+  const hasChildren = !!item.children?.length;
   const isActive = item.href === pathname;
+  const isOpen = openMenuIds.has(item.id);
   const isParentActive = item.children?.some((child) => {
     if (child.href === pathname) return true;
     if (child.children) {
@@ -36,35 +35,21 @@ export const MenuItem = ({
 
   const handleClick = () => {
     if (hasChildren) {
-      if (onToggle) {
-        onToggle(item.id);
-      } else {
-        setLocalOpen(!localOpen);
-      }
+      onToggle(item.id);
     }
   };
 
-  const effectiveOpen = onToggle ? isOpen : localOpen;
-
-  // Màu sắc chuyên nghiệp, không lòe loẹt
   const baseClasses = cn(
     "flex items-center gap-3 rounded-lg transition-all duration-200 cursor-pointer",
     "hover:bg-slate-100 dark:hover:bg-slate-800",
     {
-      // Level 0 - Menu chính
       "px-3 py-2.5": level === 0,
-      // Level 1 - Menu cấp 2
       "px-3 py-2 ml-4": level === 1,
-      // Level 2 - Menu cấp 3
       "px-3 py-1.5 ml-8": level === 2,
-      // Active state
       "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-medium":
         isActive,
-      // Parent active state
       "text-slate-900 dark:text-slate-100": isParentActive && !isActive,
-      // Default state
       "text-slate-600 dark:text-slate-400": !isActive && !isParentActive,
-      // Collapsed state
       "justify-center px-2": isCollapsed && level === 0,
     },
   );
@@ -90,7 +75,7 @@ export const MenuItem = ({
           )}
           {hasChildren && (
             <span className="shrink-0">
-              {effectiveOpen ? (
+              {isOpen ? (
                 <ChevronDown className="w-4 h-4" />
               ) : (
                 <ChevronRight className="w-4 h-4" />
@@ -119,31 +104,22 @@ export const MenuItem = ({
               handleClick();
             }
           }}
-          aria-expanded={hasChildren ? effectiveOpen : undefined}
+          aria-expanded={hasChildren ? isOpen : undefined}
         >
           {renderContent()}
         </div>
       )}
 
-      {/* Render children với animation */}
-      {hasChildren && effectiveOpen && !isCollapsed && (
-        <div
-          className={cn(
-            "mt-1 space-y-1 overflow-hidden transition-all duration-200",
-            {
-              "opacity-100": effectiveOpen,
-              "opacity-0": !effectiveOpen,
-            },
-          )}
-        >
+      {hasChildren && isOpen && !isCollapsed && (
+        <div className="mt-1 space-y-1">
           {item.children?.map((child) => (
             <MenuItem
               key={child.id}
               item={child}
               level={level + 1}
               isCollapsed={isCollapsed}
+              openMenuIds={openMenuIds}
               onToggle={onToggle}
-              isOpen={onToggle ? isOpen : undefined}
             />
           ))}
         </div>

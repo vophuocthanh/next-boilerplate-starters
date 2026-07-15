@@ -8,12 +8,49 @@ interface UserRolesPageProps {
   }>;
 }
 
+const ROLE_COLORS = {
+  red: {
+    bg: "bg-red-50 dark:bg-red-950/30",
+    text: "text-red-700 dark:text-red-400",
+    border: "border-red-200 dark:border-red-800",
+  },
+  purple: {
+    bg: "bg-purple-50 dark:bg-purple-950/30",
+    text: "text-purple-700 dark:text-purple-400",
+    border: "border-purple-200 dark:border-purple-800",
+  },
+  blue: {
+    bg: "bg-blue-50 dark:bg-blue-950/30",
+    text: "text-blue-700 dark:text-blue-400",
+    border: "border-blue-200 dark:border-blue-800",
+  },
+  green: {
+    bg: "bg-green-50 dark:bg-green-950/30",
+    text: "text-green-700 dark:text-green-400",
+    border: "border-green-200 dark:border-green-800",
+  },
+  slate: {
+    bg: "bg-slate-50 dark:bg-slate-950/30",
+    text: "text-slate-700 dark:text-slate-400",
+    border: "border-slate-200 dark:border-slate-800",
+  },
+} as const;
+
+type RoleColor = keyof typeof ROLE_COLORS;
+
 const UserRolesPage = async ({ params }: UserRolesPageProps) => {
   const { locale } = await params;
   const translationsData = await getTranslations(locale, ["dashboard"]);
   const t = translationsData.dashboard as unknown as DashboardTranslations;
 
-  const roles = [
+  const roles: Array<{
+    id: number;
+    name: string;
+    description: string;
+    userCount: number;
+    permissions: string[];
+    color: RoleColor;
+  }> = [
     {
       id: 1,
       name: "Super Admin",
@@ -61,37 +98,7 @@ const UserRolesPage = async ({ params }: UserRolesPageProps) => {
     },
   ];
 
-  const getColorClasses = (color: string) => {
-    const colors: Record<string, { bg: string; text: string; border: string }> =
-      {
-        red: {
-          bg: "bg-red-50 dark:bg-red-950/30",
-          text: "text-red-700 dark:text-red-400",
-          border: "border-red-200 dark:border-red-800",
-        },
-        purple: {
-          bg: "bg-purple-50 dark:bg-purple-950/30",
-          text: "text-purple-700 dark:text-purple-400",
-          border: "border-purple-200 dark:border-purple-800",
-        },
-        blue: {
-          bg: "bg-blue-50 dark:bg-blue-950/30",
-          text: "text-blue-700 dark:text-blue-400",
-          border: "border-blue-200 dark:border-blue-800",
-        },
-        green: {
-          bg: "bg-green-50 dark:bg-green-950/30",
-          text: "text-green-700 dark:text-green-400",
-          border: "border-green-200 dark:border-green-800",
-        },
-        slate: {
-          bg: "bg-slate-50 dark:bg-slate-950/30",
-          text: "text-slate-700 dark:text-slate-400",
-          border: "border-slate-200 dark:border-slate-800",
-        },
-      };
-    return colors[color];
-  };
+  const getColorClasses = (color: RoleColor) => ROLE_COLORS[color];
 
   return (
     <div className="space-y-6">

@@ -16,11 +16,7 @@ const AdminLayoutPage = async ({ children, params }: AdminLayoutPageProps) => {
   const translations =
     translationsData.dashboard as unknown as DashboardTranslations;
 
-  return (
-    <AdminLayout translations={translations} locale={locale}>
-      {children}
-    </AdminLayout>
-  );
+  return <AdminLayout translations={translations}>{children}</AdminLayout>;
 };
 
 export default AdminLayoutPage;

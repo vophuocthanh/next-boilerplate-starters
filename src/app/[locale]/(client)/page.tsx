@@ -1,5 +1,3 @@
-"use client";
-
 import { CTASection } from "./_components/cta-section";
 import { FeaturesSection } from "./_components/features-section";
 import { FooterSection } from "./_components/footer-section";

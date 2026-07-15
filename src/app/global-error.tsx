@@ -1,8 +1,13 @@
 "use client";
 
 import { AppError } from "@/components/providers/app-error-provider";
-import { useLocale, useTranslations } from "next-intl";
 
+/**
+ * `global-error` replaces the root layout, so it renders outside every provider
+ * — including NextIntlClientProvider. Calling a next-intl hook here throws and
+ * takes the error page down with the error it was meant to show. Strings stay
+ * hardcoded on purpose.
+ */
 export default function GlobalError({
   error,
   reset,
@@ -10,24 +15,23 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const locale = useLocale();
-  const errorMessage = error?.message || "Unknown error";
   const errorName = error?.name || "Error";
-  const t = useTranslations("error");
+  const errorMessage = error?.message || "Unknown error";
+  const title = `System error: ${errorName}`;
 
   return (
-    <html lang={locale}>
+    <html lang="en">
       <head>
-        <title>{t("systemError", { errorName })}</title>
+        <title>{title}</title>
         <meta content="width=device-width, initial-scale=1" name="viewport" />
       </head>
       <body className="bg-background text-foreground">
         <AppError
           error={error}
-          message={t("message", { errorMessage })}
+          message={`Error details: ${errorMessage}\n\nPlease try refreshing the page or come back later.`}
           reset={reset}
-          retryLabel="Làm mới trang"
-          title={t("systemError", { errorName })}
+          retryLabel="Refresh page"
+          title={title}
         />
       </body>
     </html>

@@ -57,6 +57,3 @@ docker-compose.yml
 README.md
 *.md
 
-# CI/CD
-.github
-

@@ -1,76 +1,4 @@
-import dayjs from "dayjs";
-
-export const DATE_TIME = {
-  STANDARD_DATE_FORMAT: "YYYY-MM-DD",
-  STANDARD_DATE_FORMAT_INVERSE: "DD-MM-YYYY",
-  STANDARD_DATE_FORMAT_US: "MM-DD-YYYY",
-  STANDARD_DATE_FORMAT_SLASH: "DD/MM/YYYY",
-  STANDARD_DATE_FORMAT_FULL: "DD/MM/YYYY HH:mm",
-  STANDARD_DATE_FORMAT_FULL_TIME: "DD-MM-YYYY HH:mm:ss",
-  VIETNAMESE_TIME_ZONE_OFFSET: 7,
-  STANDARD_TIME_FORMAT: "HH:mm:ss",
-  STANDARD_TIME_FORMAT_MM_YYYY: "MM/YYYY",
-  STANDARD_TIME_FORMAT_MM_YYYY_INVERSE: "MM-YYYY",
-  TIMEZONE_OFFSET: dayjs().format("Z"),
-} as const;
-
-/**
- * Debounce time constants
- */
-
-export const DEBOUNCE_TIME = {
-  DEBOUNCE_TIME_50: 50,
-  DEBOUNCE_TIME_100: 100,
-  DEBOUNCE_TIME_150: 150,
-  DEBOUNCE_TIME_200: 200,
-  DEBOUNCE_TIME_250: 250,
-  DEBOUNCE_TIME_300: 300,
-  DEBOUNCE_TIME_350: 350,
-  DEBOUNCE_TIME_400: 400,
-};
-
-export const DEFAULT_PAGE_SIZE_OPTION = [10, 20, 30, 40, 50];
-
-export const DEFAULT_PAGE_SIZE = 10;
-
-export const EMPTY_STRING = "---";
-
-export const EMPTY_WIDTH_400 = 400;
-
-export const NUMBER_CONSTANTS = {
-  ZERO: 0,
-  ONE: 1,
-  TWO: 2,
-  THREE: 3,
-  FOUR: 4,
-  FIVE: 5,
-  SIX: 6,
-  SEVEN: 7,
-  EIGHT: 8,
-  NINE: 9,
-  TEN: 10,
-  ONE_HUNDRED: 100,
-};
-
-export const WIDTH_CONST = {
-  WIDTH_400: 400,
-  WIDTH_600: 600,
-  WIDTH_800: 800,
-  WIDTH_1000: 1000,
-  WIDTH_1100: 1100,
-  MAX_LENGTH_20: 20,
-  MAX_LENGTH_255: 255,
-  MAX_LENGTH_500: 500,
-  MAX_LENGTH_1000: 1000,
-  MAX_LENGTH_2000: 2000,
-  MAX_LENGTH_TEXT_AREA: 500,
-};
-
-export const ERROR_TYPE = "error";
-
 export const TIME_ZONE = "Asia/Ho_Chi_Minh";
-
-export const VND_CURRENCY_UNIT = "VND";
 
 export const CONSTANTS_MOUSE_DOWN = "mousedown";
 export const CONSTANTS_TOUCH_START = "touchstart";
@@ -78,4 +6,3 @@ export const CONSTANTS_TOUCH_START = "touchstart";
 export const COOKIE_LOCALE = "NEXT_LOCALE";
 export const COOKIE_LOCALE_MAX_AGE = 60 * 60 * 24 * 365;
 export const COOKIE_LOCALE_SAME_SITE = "Lax";
-export const ACCEPT_LANGUAGE_HEADER = "accept-language";

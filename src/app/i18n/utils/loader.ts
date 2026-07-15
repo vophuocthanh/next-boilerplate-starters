@@ -1,7 +1,10 @@
-import { defaultLocale, locales } from "@/app/i18n/config/settings";
+import {
+  defaultLocale,
+  locales,
+  type Locale,
+} from "@/app/i18n/config/settings";
 import { Messages } from "next-intl";
 
-// list of namespaces
 export const namespaces = [
   "common",
   "auth",
@@ -11,55 +14,48 @@ export const namespaces = [
   "dashboard",
 ];
 
-// const server only request all translations
-export const loadAllTranslations = async (
+const loadNamespaces = async (
   locale: string,
+  requested: string[],
 ): Promise<Messages> => {
   try {
-    const translations: Messages = {};
+    const entries = await Promise.all(
+      requested.map(
+        async (namespace) =>
+          [
+            namespace,
+            (await import(`../dictionaries/${locale}/${namespace}.json`))
+              .default,
+          ] as const,
+      ),
+    );
 
-    for (const namespace of namespaces) {
-      translations[namespace] = await import(
-        `../dictionaries/${locale}/${namespace}.json`
-      ).then((module) => module.default);
-    }
-
-    return translations;
+    return Object.fromEntries(entries);
   } catch (error) {
     console.error(`Could not load messages for locale: ${locale}`, error);
     return {};
   }
 };
 
-// const server only specified namespaces
-export const loadTranslations = async (
-  locale: string,
-  namespaces?: string | string[],
-): Promise<Messages> => {
-  const allTranslations = await loadAllTranslations(locale);
+/** Server only. Loads every namespace. */
+export const loadAllTranslations = (locale: string): Promise<Messages> =>
+  loadNamespaces(locale, namespaces);
 
-  if (!namespaces || !namespaces.length) {
-    return allTranslations;
+/**
+ * Server only. Loads just the namespaces asked for — importing all six and
+ * then discarding five buys nothing.
+ */
+export const loadTranslations = (
+  locale: string,
+  requested?: string | string[],
+): Promise<Messages> => {
+  if (!requested || !requested.length) {
+    return loadAllTranslations(locale);
   }
 
-  const selectedNamespaces = Array.isArray(namespaces)
-    ? namespaces
-    : [namespaces];
-  const selectedTranslations: Messages = {};
-
-  selectedNamespaces.forEach((namespace) => {
-    if (allTranslations[namespace]) {
-      selectedTranslations[namespace] = allTranslations[namespace];
-    }
-  });
-
-  return selectedTranslations;
+  const selected = Array.isArray(requested) ? requested : [requested];
+  return loadNamespaces(locale, selected);
 };
 
-// const server only safe locale
-export const getSafeLocale = (locale: string | undefined): string => {
-  const safeLocale = typeof locale === "string" ? locale : defaultLocale;
-  return locales.includes(safeLocale as (typeof locales)[number])
-    ? safeLocale
-    : defaultLocale;
-};
+export const getSafeLocale = (locale: string | undefined): Locale =>
+  locales.includes(locale as Locale) ? (locale as Locale) : defaultLocale;

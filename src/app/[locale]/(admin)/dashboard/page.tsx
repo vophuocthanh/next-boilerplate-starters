@@ -1,5 +1,11 @@
 import { getTranslations } from "@/app/i18n/server";
-import { Users, TrendingUp, ShoppingCart, DollarSign } from "lucide-react";
+import {
+  Users,
+  TrendingUp,
+  ShoppingCart,
+  DollarSign,
+  type LucideIcon,
+} from "lucide-react";
 import { DashboardTranslations } from "@/components/layout/admin/types";
 
 interface DashboardPageProps {
@@ -8,13 +14,45 @@ interface DashboardPageProps {
   }>;
 }
 
+const STAT_COLORS = {
+  blue: {
+    bg: "bg-blue-50 dark:bg-blue-950/30",
+    text: "text-blue-600 dark:text-blue-400",
+    icon: "bg-blue-500",
+  },
+  green: {
+    bg: "bg-green-50 dark:bg-green-950/30",
+    text: "text-green-600 dark:text-green-400",
+    icon: "bg-green-500",
+  },
+  purple: {
+    bg: "bg-purple-50 dark:bg-purple-950/30",
+    text: "text-purple-600 dark:text-purple-400",
+    icon: "bg-purple-500",
+  },
+  orange: {
+    bg: "bg-orange-50 dark:bg-orange-950/30",
+    text: "text-orange-600 dark:text-orange-400",
+    icon: "bg-orange-500",
+  },
+} as const;
+
+type StatColor = keyof typeof STAT_COLORS;
+
 const DashboardPage = async ({ params }: DashboardPageProps) => {
   const { locale } = await params;
   const translationsData = await getTranslations(locale, ["dashboard"]);
   const t = translationsData.dashboard as unknown as DashboardTranslations;
 
   // Demo data
-  const stats = [
+  const stats: Array<{
+    title: string;
+    value: string;
+    change: string;
+    trend: "up" | "down";
+    icon: LucideIcon;
+    color: StatColor;
+  }> = [
     {
       title: t.totalUsers,
       value: "24,547",
@@ -56,31 +94,7 @@ const DashboardPage = async ({ params }: DashboardPageProps) => {
     { id: 4, action: "Payment received", time: "15 minutes ago" },
   ];
 
-  const getColorClasses = (color: string) => {
-    const colors: Record<string, { bg: string; text: string; icon: string }> = {
-      blue: {
-        bg: "bg-blue-50 dark:bg-blue-950/30",
-        text: "text-blue-600 dark:text-blue-400",
-        icon: "bg-blue-500",
-      },
-      green: {
-        bg: "bg-green-50 dark:bg-green-950/30",
-        text: "text-green-600 dark:text-green-400",
-        icon: "bg-green-500",
-      },
-      purple: {
-        bg: "bg-purple-50 dark:bg-purple-950/30",
-        text: "text-purple-600 dark:text-purple-400",
-        icon: "bg-purple-500",
-      },
-      orange: {
-        bg: "bg-orange-50 dark:bg-orange-950/30",
-        text: "text-orange-600 dark:text-orange-400",
-        icon: "bg-orange-500",
-      },
-    };
-    return colors[color];
-  };
+  const getColorClasses = (color: StatColor) => STAT_COLORS[color];
 
   return (
     <div className="space-y-6">

@@ -9,7 +9,6 @@ import { MenuItem as MenuItemType, DashboardTranslations } from "./types";
 
 interface SidebarProps {
   translations: DashboardTranslations;
-  locale: string;
   isCollapsed: boolean;
   onToggleCollapse: (collapsed: boolean) => void;
 }
@@ -96,8 +95,8 @@ export const Sidebar = ({
               item={item}
               level={0}
               isCollapsed={isCollapsed}
+              openMenuIds={openMenuIds}
               onToggle={handleToggleMenu}
-              isOpen={openMenuIds.has(item.id)}
             />
           ))}
         </div>

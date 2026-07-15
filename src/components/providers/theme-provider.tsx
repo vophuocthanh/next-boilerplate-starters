@@ -5,7 +5,12 @@ import type { ReactNode } from "react";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
-    <NextThemesProvider enableSystem attribute="class" defaultTheme="system">
+    <NextThemesProvider
+      enableSystem
+      attribute="class"
+      defaultTheme="system"
+      enableColorScheme={false}
+    >
       {children}
     </NextThemesProvider>
   );

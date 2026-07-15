@@ -1,8 +1,15 @@
 import { httpClient } from "@/core/service/http-client";
+import {
+  clearLS,
+  getRefreshTokenFromLS,
+  setAccessTokenToLS,
+  setRefreshTokenToLS,
+  setUserToLS,
+} from "@/core/utils/storage";
 import type {
   Account,
   LoginResponse,
-  RegisterReponse,
+  RegisterResponse,
 } from "@/model/interface/auth.interface";
 
 class AuthService {
@@ -13,27 +20,37 @@ class AuthService {
   }
 
   async login(params: Account): Promise<LoginResponse> {
-    return httpClient.post<LoginResponse>(this.getEndpoint("/login"), params);
+    const data = await httpClient.post<LoginResponse>(
+      this.getEndpoint("/login"),
+      params,
+    );
+
+    setAccessTokenToLS(data.access_token);
+    setRefreshTokenToLS(data.refresh_token);
+    setUserToLS(data.user);
+
+    return data;
   }
 
-  async register(params: Account): Promise<RegisterReponse> {
-    return httpClient.post<RegisterReponse>(
+  async register(params: Account): Promise<RegisterResponse> {
+    return httpClient.post<RegisterResponse>(
       this.getEndpoint("/register"),
       params,
     );
   }
 
-  async logout(refreshToken?: string): Promise<void> {
-    return httpClient.post<void>(
-      this.getEndpoint("/logout"),
-      refreshToken ? { refresh_token: refreshToken } : undefined,
-    );
-  }
+  async logout(): Promise<void> {
+    const refreshToken = getRefreshTokenFromLS();
 
-  async refreshToken(refreshToken: string): Promise<LoginResponse> {
-    return httpClient.post<LoginResponse>(this.getEndpoint("/refresh-token"), {
-      refresh_token: refreshToken,
-    });
+    try {
+      // The server needs the token to revoke it; without it the refresh token
+      // stays valid long after the user believes they signed out.
+      await httpClient.post<void>(this.getEndpoint("/logout"), {
+        refresh_token: refreshToken,
+      });
+    } finally {
+      clearLS();
+    }
   }
 }
 

@@ -11,7 +11,6 @@ import { ErrorContent } from "@/components/ui/error/error-content";
 import { AnimatedErrorIcon } from "@/components/ui/error/error-icon";
 import { ErrorId } from "@/components/ui/error/error-id";
 import { RetryButton } from "@/components/ui/error/retry-button";
-import { useMounted } from "@/hooks/use-mounted";
 
 type AppErrorProps = {
   error: Error & { digest?: string };
@@ -29,10 +28,6 @@ export const AppError = ({
   retryLabel = "Thử lại",
 }: AppErrorProps) => {
   const safeError = error || new Error("Unknown error");
-
-  const mounted = useMounted();
-
-  if (!mounted) return null;
 
   const handleReset = () => {
     if (typeof reset === "function") {

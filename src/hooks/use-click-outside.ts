@@ -10,12 +10,20 @@ export const useClickOutside = <T extends HTMLElement>(
 ): RefObject<T> => {
   const ref = useRef<T>(null);
 
+  // Callers pass inline arrows, so `handler` is a fresh reference every render.
+  // Reading it through a ref keeps the listener attached exactly once.
+  const handlerRef = useRef(handler);
+
+  useEffect(() => {
+    handlerRef.current = handler;
+  });
+
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
       if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
       }
-      handler();
+      handlerRef.current();
     };
 
     document.addEventListener(CONSTANTS_MOUSE_DOWN, listener);
@@ -25,7 +33,7 @@ export const useClickOutside = <T extends HTMLElement>(
       document.removeEventListener(CONSTANTS_MOUSE_DOWN, listener);
       document.removeEventListener(CONSTANTS_TOUCH_START, listener);
     };
-  }, [handler]);
+  }, []);
 
   return ref as RefObject<T>;
 };

@@ -6,7 +6,6 @@ export interface LoginResponse {
   refresh_token: string;
 }
 
-// define the Account interface
 export interface Account {
   email?: string;
   password?: string;
@@ -15,8 +14,7 @@ export interface Account {
   phone?: string;
 }
 
-// define the RegisterReponse interface
-export interface RegisterReponse {
+export interface RegisterResponse {
   name: string;
   email: string;
   password: string;

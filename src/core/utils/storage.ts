@@ -5,18 +5,17 @@ import {
 } from "@/core/helpers/consts";
 import type { UserResponseType } from "@/model/interface/user.interface";
 
-// Constants
 const STORAGE_KEYS = {
   ACCESS_TOKEN: "access_token",
   REFRESH_TOKEN: "refresh_token",
   USER: "user",
 } as const;
 
-// Event handling
-export const LocalStorageEventTarget = new EventTarget();
+const isClient = typeof window !== "undefined";
 
 // Generic localStorage utilities
 export const setItemToLS = <T>(key: string, value: T): void => {
+  if (!isClient) return;
   try {
     const serializedValue =
       typeof value === "string" ? value : JSON.stringify(value);
@@ -27,13 +26,14 @@ export const setItemToLS = <T>(key: string, value: T): void => {
 };
 
 export const getItemFromLS = <T>(key: string, defaultValue?: T): T | null => {
+  if (!isClient) return defaultValue ?? null;
   try {
     const item = localStorage.getItem(key);
     if (!item) {
-      return defaultValue || null;
+      return defaultValue ?? null;
     }
 
-    // Try to parse as JSON, if it fails return as string
+    // Tokens are stored as raw strings, everything else as JSON.
     try {
       return JSON.parse(item) as T;
     } catch {
@@ -44,11 +44,12 @@ export const getItemFromLS = <T>(key: string, defaultValue?: T): T | null => {
       `Failed to get item from localStorage with key: ${key}`,
       error,
     );
-    return defaultValue || null;
+    return defaultValue ?? null;
   }
 };
 
 export const removeItemFromLS = (key: string): void => {
+  if (!isClient) return;
   try {
     localStorage.removeItem(key);
   } catch (error) {
@@ -60,20 +61,16 @@ export const removeItemFromLS = (key: string): void => {
 };
 
 // Token management
-export const setAccessTokenToLS = (access_token: string): void => {
-  setItemToLS(STORAGE_KEYS.ACCESS_TOKEN, access_token);
+export const setAccessTokenToLS = (accessToken: string): void => {
+  setItemToLS(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
 };
 
 export const getAccessTokenFromLS = (): string => {
   return getItemFromLS<string>(STORAGE_KEYS.ACCESS_TOKEN, "") || "";
 };
 
-export const removeAccessTokenFromLS = (): void => {
-  removeItemFromLS(STORAGE_KEYS.ACCESS_TOKEN);
-};
-
-export const setRefreshTokenToLS = (refresh_token: string): void => {
-  setItemToLS(STORAGE_KEYS.REFRESH_TOKEN, refresh_token);
+export const setRefreshTokenToLS = (refreshToken: string): void => {
+  setItemToLS(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
 };
 
 export const getRefreshTokenFromLS = (): string => {
@@ -81,7 +78,7 @@ export const getRefreshTokenFromLS = (): string => {
 };
 
 // User management
-export const getUserFromLocalStorage = (): UserResponseType | null => {
+export const getUserFromLS = (): UserResponseType | null => {
   return getItemFromLS<UserResponseType>(STORAGE_KEYS.USER);
 };
 
@@ -91,6 +88,7 @@ export const setUserToLS = (user: UserResponseType): void => {
 
 // Cookie management
 export const setLocaleCookie = (locale: string): void => {
+  if (!isClient) return;
   document.cookie = `${COOKIE_LOCALE}=${locale}; path=/; max-age=${COOKIE_LOCALE_MAX_AGE}; SameSite=${COOKIE_LOCALE_SAME_SITE}`;
 };
 
@@ -99,7 +97,4 @@ export const clearLS = (): void => {
   removeItemFromLS(STORAGE_KEYS.ACCESS_TOKEN);
   removeItemFromLS(STORAGE_KEYS.REFRESH_TOKEN);
   removeItemFromLS(STORAGE_KEYS.USER);
-
-  const clearLSEvent = new Event("clearLS");
-  LocalStorageEventTarget.dispatchEvent(clearLSEvent);
 };

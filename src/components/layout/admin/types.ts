@@ -1,5 +1,7 @@
 import { LucideIcon } from "lucide-react";
 
+import type dashboardEn from "@/app/i18n/dictionaries/en/dashboard.json";
+
 export interface MenuItem {
   id: string;
   label: string;
@@ -9,51 +11,8 @@ export interface MenuItem {
   children?: MenuItem[];
 }
 
-export interface SidebarState {
-  isCollapsed: boolean;
-  openMenuIds: Set<string>;
-}
-
-export interface DashboardTranslations {
-  dashboard: string;
-  users: string;
-  settings: string;
-  search: string;
-  notifications: string;
-  logout: string;
-  totalUsers: string;
-  activeUsers: string;
-  revenue: string;
-  conversion: string;
-  recentActivity: string;
-  menu: {
-    dashboard: string;
-    analytics: string;
-    users: string;
-    userList: string;
-    userRoles: string;
-    userPermissions: string;
-    products: string;
-    productList: string;
-    categories: string;
-    inventory: string;
-    orders: string;
-    reports: string;
-    salesReport: string;
-    userReport: string;
-    settings: string;
-    generalSettings: string;
-    security: string;
-    profile: string;
-  };
-  sidebar: {
-    collapse: string;
-    expand: string;
-  };
-  topbar: {
-    search: string;
-    viewProfile: string;
-    account: string;
-    logout: string;
-  };
-}
+/**
+ * Derived from the English dictionary rather than hand-written, so the type and
+ * the JSON can never drift apart.
+ */
+export type DashboardTranslations = typeof dashboardEn;

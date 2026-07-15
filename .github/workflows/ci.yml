@@ -1,13 +1,46 @@
-name: Deploy Next to Docker 🐼
+name: CI 🐼
 
 on:
   push:
     branches:
       - develop
+  pull_request:
 
 jobs:
-  build:
+  quality:
+    name: 🔍 Lint & Typecheck
     runs-on: ubuntu-latest
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🅿️ Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🎨 Check formatting
+        run: pnpm format:check
+
+      - name: 🔍 Lint
+        run: pnpm lint
+
+      - name: 🧠 Typecheck
+        run: pnpm typecheck
+
+  docker:
+    name: 🐋 Build & push image
+    runs-on: ubuntu-latest
+    # Never publish an image that failed the quality gate.
+    needs: quality
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     steps:
       - name: 📦 Checkout code
         uses: actions/checkout@v4
@@ -27,13 +60,17 @@ jobs:
           echo "short_name=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_OUTPUT
 
       - name: 📦 Build and push Docker
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           file: Dockerfile
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+          # `develop` is not production — tagging it :latest would hand develop
+          # code to anyone pulling the default tag.
           tags: |
-            vophuocthanh/next-boilerplate-starters:latest
+            vophuocthanh/next-boilerplate-starters:develop
             vophuocthanh/next-boilerplate-starters:${{ steps.next-image.outputs.short_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

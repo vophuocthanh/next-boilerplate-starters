@@ -4,13 +4,8 @@ import { motion } from "framer-motion";
 import { Home } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useMounted } from "@/hooks/use-mounted";
 
 export default function NotFoundApp() {
-  const mounted = useMounted();
-
-  if (!mounted) return null;
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center">
       <div className="relative mx-auto w-full max-w-xl">
@@ -62,14 +57,14 @@ export default function NotFoundApp() {
             initial={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-9xl font-bold text-transparent">
+            <h1 className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-9xl font-bold text-transparent">
               404
             </h1>
           </motion.div>
 
           <motion.div
             animate={{ width: 96 }}
-            className="mx-auto mb-8 mt-2 h-1 w-24 bg-gradient-to-r from-blue-600 to-purple-600"
+            className="mx-auto mb-8 mt-2 h-1 w-24 bg-linear-to-r from-blue-600 to-purple-600"
             initial={{ width: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           />
