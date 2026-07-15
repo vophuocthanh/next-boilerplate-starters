@@ -56,12 +56,15 @@ Open [http://localhost:4040](http://localhost:4040) — the app redirects to the
 
 ## 📜 Scripts
 
-| Command      | Description                                |
-| ------------ | ------------------------------------------ |
-| `pnpm dev`   | Start the dev server on port `4040`.       |
-| `pnpm build` | Build the production bundle.               |
-| `pnpm start` | Serve the production build on port `4040`. |
-| `pnpm lint`  | Run ESLint.                                |
+| Command              | Description                                |
+| -------------------- | ------------------------------------------ |
+| `pnpm dev`           | Start the dev server on port `4040`.       |
+| `pnpm build`         | Build the production bundle.               |
+| `pnpm start`         | Serve the production build on port `4040`. |
+| `pnpm lint`          | Run ESLint.                                |
+| `pnpm test`          | Run the unit test suite once.              |
+| `pnpm test:watch`    | Run tests in watch mode.                   |
+| `pnpm test:coverage` | Run tests and generate a coverage report.  |
 
 ## 📁 Project Structure
 
@@ -106,6 +109,42 @@ To add a language, extend `locales` in [`src/app/i18n/config/settings.ts`](src/a
 - Normalized error types (`HttpError`, `UnprocessableEntityError`)
 
 Use the shared `httpClient` (`get` / `post` / `put` / `patch` / `delete`) for all API calls.
+
+## 🧪 Testing
+
+Unit tests run on [Vitest](https://vitest.dev) with a `jsdom` environment and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for component tests.
+
+```bash
+# Run the whole suite once (CI mode)
+pnpm test
+
+# Watch mode — re-runs affected tests as you edit
+pnpm test:watch
+
+# Run a single file
+pnpm test src/lib/utils.test.ts
+
+# Filter by test name
+pnpm test -t "cn"
+
+# Generate a coverage report (outputs to ./coverage)
+pnpm test:coverage
+```
+
+**Conventions**
+
+- Test files live next to the code they cover, named `*.test.ts` / `*.test.tsx`.
+- Shared setup (jest-dom matchers, auto-cleanup) is in [`vitest.setup.ts`](vitest.setup.ts); runner config and the `@/*` alias are in [`vitest.config.ts`](vitest.config.ts).
+- The `@testing-library/jest-dom` matchers (`toBeInTheDocument`, `toHaveClass`, …) are available globally.
+
+Existing examples to copy from:
+
+| File                                                                           | Demonstrates                               |
+| ------------------------------------------------------------------------------ | ------------------------------------------ |
+| [`src/lib/utils.test.ts`](src/lib/utils.test.ts)                               | Pure function testing (`cn`)               |
+| [`src/core/helpers/error.utils.test.ts`](src/core/helpers/error.utils.test.ts) | Mocking side effects (`console.error`)     |
+| [`src/core/utils/storage.test.ts`](src/core/utils/storage.test.ts)             | `localStorage` / cookie helpers with jsdom |
+| [`src/components/ui/button.test.tsx`](src/components/ui/button.test.tsx)       | Component rendering & user interaction     |
 
 ## 🐳 Docker
 
