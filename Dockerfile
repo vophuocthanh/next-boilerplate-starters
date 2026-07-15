@@ -6,7 +6,7 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-lock.yaml .npmrc ./
 ENV HUSKY=0
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # ---- builder ----
 FROM base AS builder
