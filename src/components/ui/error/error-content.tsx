@@ -1,48 +1,33 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 type ErrorContentProps = {
   title: string;
   message: string;
 };
 
 export const ErrorContent = ({ title, message }: ErrorContentProps) => {
+  const lines = message.includes("\n") ? message.split("\n") : null;
+
   return (
     <>
-      <motion.div
-        animate={{ opacity: 1, y: 0 }}
-        initial={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.5 }}
-      >
+      <div className="animate-fade-in-up">
         <h1 className="bg-linear-to-r from-red-600 to-amber-600 bg-clip-text text-4xl font-bold leading-[70px]! text-transparent sm:text-5xl">
           {title}
         </h1>
-      </motion.div>
+      </div>
 
-      <motion.div
-        animate={{ width: "60%" }}
-        className="mx-auto mb-8 mt-2 h-1 w-0 bg-linear-to-r from-red-600 to-amber-600"
-        initial={{ width: 0 }}
-        transition={{ duration: 0.8, delay: 0.3 }}
-      />
+      <div className="mx-auto mb-8 mt-2 h-1 w-3/5 max-w-xs bg-linear-to-r from-red-600 to-amber-600 animate-fade-in" />
 
-      <motion.div
-        animate={{ opacity: 1, y: 0 }}
-        initial={{ opacity: 0, y: 20 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
+      <div className="animate-fade-in-up animation-delay-100">
         <p className="mb-8 text-muted-foreground">
-          {message.includes("\n")
-            ? message.split("\n").map((line, i) => (
+          {lines
+            ? lines.map((line, i) => (
                 <span key={i}>
                   {line}
-                  {i < message.split("\n").length - 1 && <br />}
+                  {i < lines.length - 1 && <br />}
                 </span>
               ))
             : message}
         </p>
-      </motion.div>
+      </div>
     </>
   );
 };

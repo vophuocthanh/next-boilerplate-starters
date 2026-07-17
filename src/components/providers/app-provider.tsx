@@ -6,7 +6,6 @@ import { type FallbackProps } from "react-error-boundary";
 
 import { AppError } from "@/components/providers/app-error-provider";
 import { ErrorBoundary } from "@/components/providers/error-boundary";
-import ProviderQuery from "@/components/providers/provider-query";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TIME_ZONE } from "@/core/helpers/consts";
 
@@ -36,15 +35,13 @@ export function AppProvider({ children, locale, messages }: AppProviderProps) {
   return (
     <ErrorBoundary fallback={renderErrorFallback} onError={handleError}>
       <ThemeProvider>
-        {/* `now` is intentionally omitted: this is a client component, so
-            `new Date()` would differ between the server render and hydration.
-            next-intl already receives `now` from the server in request.ts. */}
+        {/* QueryClient lives only under (admin) — public pages don't pay for it. */}
         <NextIntlClientProvider
           locale={locale}
           messages={messages}
           timeZone={TIME_ZONE}
         >
-          <ProviderQuery>{children}</ProviderQuery>
+          {children}
         </NextIntlClientProvider>
       </ThemeProvider>
     </ErrorBoundary>

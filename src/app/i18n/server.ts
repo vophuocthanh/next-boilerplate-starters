@@ -1,10 +1,19 @@
 import { createTranslator } from "next-intl";
 
 import type { Messages } from "./config/types";
-import { loadTranslations } from "./utils/loader";
+import { loadClientTranslations, loadTranslations } from "./utils/loader";
 
+/** Full message tree (server-side). Deduped per request via `cache()`. */
 export const getMessages = async (locale: string): Promise<Messages> => {
   return loadTranslations(locale);
+};
+
+/**
+ * Slim message tree for NextIntlClientProvider.
+ * Only namespaces used by client islands (`common`, `auth`, `error`).
+ */
+export const getClientMessages = async (locale: string): Promise<Messages> => {
+  return loadClientTranslations(locale);
 };
 
 export const getTranslations = async (

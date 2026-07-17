@@ -1,7 +1,14 @@
-import { ReactNode } from "react";
-import { AdminLayout } from "@/components/layout/admin";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
 import { getTranslations } from "@/app/i18n/server";
-import { DashboardTranslations } from "@/components/layout/admin/types";
+import { AdminLayout } from "@/components/layout/admin";
+import type { DashboardTranslations } from "@/components/layout/admin/types";
+import ProviderQuery from "@/components/providers/provider-query";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 interface AdminLayoutPageProps {
   children: ReactNode;
@@ -16,7 +23,11 @@ const AdminLayoutPage = async ({ children, params }: AdminLayoutPageProps) => {
   const translations =
     translationsData.dashboard as unknown as DashboardTranslations;
 
-  return <AdminLayout translations={translations}>{children}</AdminLayout>;
+  return (
+    <ProviderQuery>
+      <AdminLayout translations={translations}>{children}</AdminLayout>
+    </ProviderQuery>
+  );
 };
 
 export default AdminLayoutPage;

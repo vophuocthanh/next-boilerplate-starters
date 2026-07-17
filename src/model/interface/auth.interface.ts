@@ -1,9 +1,15 @@
 import { UserResponseType } from "@/model/interface/user.interface";
 
+/** Raw login payload returned by the upstream API (tokens never leave the server). */
 export interface LoginResponse {
   user: UserResponseType;
   access_token: string;
   refresh_token: string;
+}
+
+/** Client-facing session after login — tokens live in httpOnly cookies only. */
+export interface AuthSessionResponse {
+  user: UserResponseType;
 }
 
 export interface Account {

@@ -6,20 +6,18 @@ import type {
 } from "axios";
 import axios, { HttpStatusCode } from "axios";
 
-import { API_URL } from "@/core/configs/env";
-import {
-  clearLS,
-  getAccessTokenFromLS,
-  getRefreshTokenFromLS,
-  setAccessTokenToLS,
-  setRefreshTokenToLS,
-} from "@/core/utils/storage";
-import type { LoginResponse } from "@/model/interface/auth.interface";
-
 const MAX_RETRY_COUNT = 3;
 const RETRY_BASE_DELAY_MS = 500;
 const TIMEOUT_MS = 10000;
-const TOKEN_PREFIX = "Bearer";
+
+/**
+ * Same-origin BFF endpoints.
+ * Access/refresh tokens live in httpOnly cookies (set by /api/auth/*).
+ * The browser never reads tokens; /api/proxy attaches Authorization server-side.
+ */
+const PROXY_BASE_URL = "/api/proxy";
+const AUTH_REFRESH_URL = "/api/auth/refresh";
+const AUTH_LOGOUT_URL = "/api/auth/logout";
 
 /** Transient failures worth retrying: no response at all, or an overloaded upstream. */
 const RETRYABLE_CODES = ["ECONNABORTED", "ETIMEDOUT", "ERR_NETWORK"];
@@ -57,7 +55,7 @@ type UnprocessableEntityErrorPayload = HttpErrorPayload & {
 };
 
 type RefreshTokenQueueItem = {
-  resolve: (token: string) => void;
+  resolve: () => void;
   reject: (error: unknown) => void;
 };
 
@@ -68,26 +66,16 @@ type ExtendedInternalAxiosRequestConfig = InternalAxiosRequestConfig & {
 
 const isClient = typeof window !== "undefined";
 
-/**
- * Bare client used only to renew tokens. It deliberately has no interceptors:
- * routing the refresh call through the main instance would let a 401 from the
- * refresh endpoint trigger another refresh, recursing without end.
- */
-const refreshClient = axios.create({
-  baseURL: API_URL,
-  timeout: TIMEOUT_MS,
-  headers: { "Content-Type": "application/json" },
-});
-
 class HttpClient {
   private instance: AxiosInstance;
   private isRefreshing = false;
   private refreshQueue: RefreshTokenQueueItem[] = [];
 
-  constructor(baseURL: string = API_URL) {
+  constructor(baseURL: string = PROXY_BASE_URL) {
     this.instance = axios.create({
       baseURL,
       timeout: TIMEOUT_MS,
+      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
       },
@@ -97,11 +85,6 @@ class HttpClient {
   }
 
   private setupInterceptors(): void {
-    this.instance.interceptors.request.use(
-      (config) => this.handleRequest(config),
-      (error) => Promise.reject(error),
-    );
-
     this.instance.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
@@ -129,21 +112,6 @@ class HttpClient {
         }
       },
     );
-  }
-
-  private handleRequest(
-    config: InternalAxiosRequestConfig,
-  ): InternalAxiosRequestConfig {
-    if (isClient) {
-      const accessToken = getAccessTokenFromLS();
-      if (accessToken) {
-        // `config.headers` is an AxiosHeaders instance; spreading it into a
-        // plain object would strip the methods axios relies on downstream.
-        config.headers.set("Authorization", `${TOKEN_PREFIX} ${accessToken}`);
-      }
-    }
-
-    return config;
   }
 
   private shouldRetry(error: AxiosError): boolean {
@@ -186,60 +154,53 @@ class HttpClient {
     originalRequest._retry = true;
 
     if (this.isRefreshing) {
-      return new Promise<string>((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         this.refreshQueue.push({ resolve, reject });
-      }).then((token) => {
-        originalRequest.headers.set(
-          "Authorization",
-          `${TOKEN_PREFIX} ${token}`,
-        );
-        return this.instance<T>(originalRequest);
-      });
+      }).then(() => this.instance<T>(originalRequest));
     }
 
     this.isRefreshing = true;
     try {
-      const refreshToken = getRefreshTokenFromLS();
-      if (!refreshToken) {
-        throw new Error("No refresh token available");
+      // Refresh route reads the httpOnly refresh cookie and rotates tokens.
+      const refreshResponse = await fetch(AUTH_REFRESH_URL, {
+        method: "POST",
+        credentials: "same-origin",
+      });
+
+      if (!refreshResponse.ok) {
+        throw new Error("Failed to refresh session");
       }
 
-      const { data } = await refreshClient.post<LoginResponse>(
-        "/auth/refresh-token",
-        { refresh_token: refreshToken },
-      );
-
-      setAccessTokenToLS(data.access_token);
-      if (data.refresh_token) {
-        setRefreshTokenToLS(data.refresh_token);
-      }
-
-      originalRequest.headers.set(
-        "Authorization",
-        `${TOKEN_PREFIX} ${data.access_token}`,
-      );
-      this.processQueue(data.access_token);
-
+      this.processQueue();
       return this.instance<T>(originalRequest);
     } catch (refreshError) {
-      this.processQueue(null, refreshError);
-      clearLS();
+      this.processQueue(refreshError);
+      await this.clearSession();
       return Promise.reject(refreshError);
     } finally {
       this.isRefreshing = false;
     }
   }
 
-  private processQueue(token: string | null, error?: unknown): void {
+  private processQueue(error?: unknown): void {
     const queue = this.refreshQueue;
     this.refreshQueue = [];
 
-    if (token) {
-      queue.forEach(({ resolve }) => resolve(token));
+    if (error) {
+      queue.forEach(({ reject }) => reject(error));
     } else {
-      queue.forEach(({ reject }) =>
-        reject(error || new Error("Failed to refresh token")),
-      );
+      queue.forEach(({ resolve }) => resolve());
+    }
+  }
+
+  private async clearSession(): Promise<void> {
+    try {
+      await fetch(AUTH_LOGOUT_URL, {
+        method: "POST",
+        credentials: "same-origin",
+      });
+    } catch {
+      // Best-effort; browser may already have cleared cookies on expiry.
     }
   }
 

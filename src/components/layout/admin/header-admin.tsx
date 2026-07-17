@@ -1,8 +1,11 @@
 "use client";
 
+import { Bell, LogOut, Menu, Search, Settings, User } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Search, Bell, Settings, LogOut, User } from "lucide-react";
+
+import { useRouter } from "@/app/i18n/navigation";
+import { LanguageSwitcher } from "@/components/common/language-switcher";
+import { ThemeToggle } from "@/components/common/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,21 +14,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { DashboardTranslations } from "./types";
-import { LanguageSwitcher } from "@/components/common/language-switcher";
-import { ThemeToggle } from "@/components/common/theme-toggle";
-import { authApi } from "@/core/service/auth.service";
 import { ROUTE_CONSTANTS } from "@/core/constant/route";
+import { authApi } from "@/core/service/auth.service";
+import { cn } from "@/lib/utils";
+
+import type { DashboardTranslations } from "./types";
 
 interface HeaderAdminProps {
   translations: DashboardTranslations;
   isCollapsed: boolean;
+  onMobileMenuOpen: () => void;
 }
 
 export const HeaderAdmin = ({
   translations,
   isCollapsed,
+  onMobileMenuOpen,
 }: HeaderAdminProps) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,8 +55,17 @@ export const HeaderAdmin = ({
       )}
     >
       <div className="h-full px-4 flex items-center justify-between gap-4">
-        <div className="flex-1 max-w-md">
-          <div className="relative">
+        <div className="flex items-center gap-2 flex-1 max-w-md min-w-0">
+          <button
+            type="button"
+            onClick={onMobileMenuOpen}
+            className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            aria-label="Open sidebar"
+          >
+            <Menu className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+          </button>
+
+          <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
@@ -80,6 +93,7 @@ export const HeaderAdmin = ({
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <button
+                type="button"
                 className="relative p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 aria-label={translations.notifications}
               >
@@ -115,7 +129,10 @@ export const HeaderAdmin = ({
           <div className="relative">
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 p-1.5 pr-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 p-1.5 pr-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full"
+                >
                   <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0">
                     <span className="text-white text-sm font-medium">AD</span>
                   </div>

@@ -1,4 +1,3 @@
-import { getTranslations } from "@/app/i18n/server";
 import {
   Users,
   TrendingUp,
@@ -6,7 +5,7 @@ import {
   DollarSign,
   type LucideIcon,
 } from "lucide-react";
-import { DashboardTranslations } from "@/components/layout/admin/types";
+import { getTranslations } from "next-intl/server";
 
 interface DashboardPageProps {
   params: Promise<{
@@ -41,8 +40,7 @@ type StatColor = keyof typeof STAT_COLORS;
 
 const DashboardPage = async ({ params }: DashboardPageProps) => {
   const { locale } = await params;
-  const translationsData = await getTranslations(locale, ["dashboard"]);
-  const t = translationsData.dashboard as unknown as DashboardTranslations;
+  const t = await getTranslations({ locale, namespace: "dashboard" });
 
   // Demo data
   const stats: Array<{
@@ -54,7 +52,7 @@ const DashboardPage = async ({ params }: DashboardPageProps) => {
     color: StatColor;
   }> = [
     {
-      title: t.totalUsers,
+      title: t("totalUsers"),
       value: "24,547",
       change: "+12.5%",
       trend: "up" as const,
@@ -62,7 +60,7 @@ const DashboardPage = async ({ params }: DashboardPageProps) => {
       color: "blue",
     },
     {
-      title: t.activeUsers,
+      title: t("activeUsers"),
       value: "18,432",
       change: "+8.2%",
       trend: "up" as const,
@@ -70,7 +68,7 @@ const DashboardPage = async ({ params }: DashboardPageProps) => {
       color: "green",
     },
     {
-      title: t.revenue,
+      title: t("revenue"),
       value: "$156,890",
       change: "+15.3%",
       trend: "up" as const,
@@ -78,7 +76,7 @@ const DashboardPage = async ({ params }: DashboardPageProps) => {
       color: "purple",
     },
     {
-      title: t.conversion,
+      title: t("conversion"),
       value: "3.24%",
       change: "-2.1%",
       trend: "down" as const,
@@ -101,7 +99,7 @@ const DashboardPage = async ({ params }: DashboardPageProps) => {
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          {t.dashboard}
+          {t("dashboard")}
         </h1>
         <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
           Welcome back! Here&apos;s what&apos;s happening today.
@@ -153,7 +151,7 @@ const DashboardPage = async ({ params }: DashboardPageProps) => {
         {/* Recent Activity */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
-            {t.recentActivity}
+            {t("recentActivity")}
           </h2>
           <div className="space-y-4">
             {recentActivities.map((activity) => (

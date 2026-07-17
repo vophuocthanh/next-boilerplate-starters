@@ -1,11 +1,21 @@
 {
+  "meta": {
+    "title": "NextJS Boilerplate 2025 — Modern Next.js Starter",
+    "description": "Production-ready Next.js boilerplate with TypeScript, Tailwind CSS, next-intl, TanStack Query, and Docker."
+  },
   "hero": {
     "introducing": "NextJS Boilerplate 2025",
     "title": "Modern Boilerplate for Professional Web Applications",
     "description": "Kickstart your Next.js project with TypeScript, TailwindCSS, and modern development tools. Build faster, scale smarter, deploy seamlessly.",
     "getStarted": "Start Building",
     "viewDocs": "View Documentation",
-    "github": "View on GitHub"
+    "github": "View on GitHub",
+    "stats": {
+      "fast": "Lightning Fast",
+      "secure": "Secure",
+      "scalable": "Scalable",
+      "openSource": "Open Source"
+    }
   },
   "features": {
     "title": "Key Features",
@@ -38,6 +48,10 @@
       }
     }
   },
+  "tech": {
+    "title": "Built with a Modern Tech Stack",
+    "subtitle": "Powered by industry-leading tools and frameworks"
+  },
   "testimonials": {
     "title": "What our customers say",
     "subtitle": "Discover the experiences of customers who have used our boilerplate",
@@ -61,7 +75,7 @@
         "company": "GlobalTech"
       },
       "4": {
-        "content": "Next.js 14 combined with TailwindCSS in this boilerplate creates an excellent development experience. We've reduced development time by 40%.",
+        "content": "Next.js combined with TailwindCSS in this boilerplate creates an excellent development experience. We've reduced development time by 40%.",
         "author": "Emily Chen",
         "role": "UI/UX Team Lead",
         "company": "DesignHub"
@@ -87,6 +101,7 @@
     "careers": "Careers",
     "press": "Press",
     "contact": "Contact",
+    "legal": "Legal",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
     "cookiePolicy": "Cookie Policy",

@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
 import type { Locale } from "@/app/i18n/config/settings";
-import { getMessages } from "@/app/i18n/server";
+import { getClientMessages } from "@/app/i18n/server";
 import { AppProvider } from "@/components/providers/app-provider";
 
 interface LocaleLayoutProps extends PropsWithChildren {
@@ -15,7 +15,9 @@ export default async function LocaleLayout({
   params,
 }: LocaleLayoutProps) {
   const { locale } = await params;
-  const messages = await getMessages(locale as Locale);
+  // Only hydrate namespaces that client islands actually read
+  // (`common` / `auth` / `error`). Landing/dashboard copy stays server-side.
+  const messages = await getClientMessages(locale as Locale);
 
   return (
     <AppProvider locale={locale as Locale} messages={messages}>

@@ -1,10 +1,16 @@
+import { cache } from "react";
+import type { Messages } from "next-intl";
+
 import {
   defaultLocale,
   locales,
   type Locale,
 } from "@/app/i18n/config/settings";
-import { Messages } from "next-intl";
 
+/** Namespaces hydrated into NextIntlClientProvider (client islands only). */
+export const clientNamespaces = ["common", "auth", "error"] as const;
+
+/** All translation namespaces available on the server. */
 export const namespaces = [
   "common",
   "auth",
@@ -12,11 +18,13 @@ export const namespaces = [
   "landing",
   "pages",
   "dashboard",
-];
+] as const;
+
+export type Namespace = (typeof namespaces)[number];
 
 const loadNamespaces = async (
   locale: string,
-  requested: string[],
+  requested: readonly string[],
 ): Promise<Messages> => {
   try {
     const entries = await Promise.all(
@@ -37,13 +45,24 @@ const loadNamespaces = async (
   }
 };
 
-/** Server only. Loads every namespace. */
-export const loadAllTranslations = (locale: string): Promise<Messages> =>
-  loadNamespaces(locale, namespaces);
+/**
+ * Dedupes JSON loads within a single React request (layout + page + request.ts).
+ */
+export const loadAllTranslations = cache(
+  (locale: string): Promise<Messages> => loadNamespaces(locale, namespaces),
+);
 
 /**
- * Server only. Loads just the namespaces asked for — importing all six and
- * then discarding five buys nothing.
+ * Loads only the namespaces needed for client providers (keeps hydration payload small).
+ */
+export const loadClientTranslations = cache(
+  (locale: string): Promise<Messages> =>
+    loadNamespaces(locale, clientNamespaces),
+);
+
+/**
+ * Server only. Loads just the namespaces asked for.
+ * Empty / omitted list → all namespaces (via cached loadAllTranslations).
  */
 export const loadTranslations = (
   locale: string,
@@ -54,6 +73,8 @@ export const loadTranslations = (
   }
 
   const selected = Array.isArray(requested) ? requested : [requested];
+  // Per-request dedupe by joining selected keys into a stable cache key via
+  // a nested cached helper would be overkill; small admin loads stay cheap.
   return loadNamespaces(locale, selected);
 };
 

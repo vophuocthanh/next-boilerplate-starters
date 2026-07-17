@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ChevronDown, ChevronRight } from "lucide-react";
+
+import { Link, usePathname } from "@/app/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { MenuItem as MenuItemType } from "./types";
+
+import type { MenuItem as MenuItemType } from "./types";
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -12,6 +13,7 @@ interface MenuItemProps {
   isCollapsed: boolean;
   openMenuIds: Set<string>;
   onToggle: (id: string) => void;
+  onNavigate?: () => void;
 }
 
 export const MenuItem = ({
@@ -20,10 +22,12 @@ export const MenuItem = ({
   isCollapsed,
   openMenuIds,
   onToggle,
+  onNavigate,
 }: MenuItemProps) => {
+  // next-intl usePathname returns path without the locale prefix.
   const pathname = usePathname();
   const hasChildren = !!item.children?.length;
-  const isActive = item.href === pathname;
+  const isActive = !!item.href && item.href === pathname;
   const isOpen = openMenuIds.has(item.id);
   const isParentActive = item.children?.some((child) => {
     if (child.href === pathname) return true;
@@ -90,7 +94,7 @@ export const MenuItem = ({
   return (
     <div>
       {item.href && !hasChildren ? (
-        <Link href={item.href} className={baseClasses}>
+        <Link href={item.href} className={baseClasses} onClick={onNavigate}>
           {renderContent()}
         </Link>
       ) : (
@@ -120,6 +124,7 @@ export const MenuItem = ({
               isCollapsed={isCollapsed}
               openMenuIds={openMenuIds}
               onToggle={onToggle}
+              onNavigate={onNavigate}
             />
           ))}
         </div>

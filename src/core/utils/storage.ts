@@ -2,99 +2,64 @@ import {
   COOKIE_LOCALE,
   COOKIE_LOCALE_MAX_AGE,
   COOKIE_LOCALE_SAME_SITE,
+  COOKIE_USER,
 } from "@/core/helpers/consts";
 import type { UserResponseType } from "@/model/interface/user.interface";
 
-const STORAGE_KEYS = {
-  ACCESS_TOKEN: "access_token",
-  REFRESH_TOKEN: "refresh_token",
-  USER: "user",
-} as const;
-
 const isClient = typeof window !== "undefined";
 
-// Generic localStorage utilities
-export const setItemToLS = <T>(key: string, value: T): void => {
+function getCookieValue(name: string): string | null {
+  if (!isClient) return null;
+
+  const prefix = `${name}=`;
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(prefix));
+
+  if (!match) return null;
+  return decodeURIComponent(match.slice(prefix.length));
+}
+
+function setClientCookie(
+  name: string,
+  value: string,
+  maxAge: number,
+  sameSite: string = "Lax",
+): void {
   if (!isClient) return;
-  try {
-    const serializedValue =
-      typeof value === "string" ? value : JSON.stringify(value);
-    localStorage.setItem(key, serializedValue);
-  } catch (error) {
-    console.error(`Failed to set item to localStorage with key: ${key}`, error);
-  }
-};
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=${sameSite}`;
+}
 
-export const getItemFromLS = <T>(key: string, defaultValue?: T): T | null => {
-  if (!isClient) return defaultValue ?? null;
-  try {
-    const item = localStorage.getItem(key);
-    if (!item) {
-      return defaultValue ?? null;
-    }
-
-    // Tokens are stored as raw strings, everything else as JSON.
-    try {
-      return JSON.parse(item) as T;
-    } catch {
-      return item as unknown as T;
-    }
-  } catch (error) {
-    console.error(
-      `Failed to get item from localStorage with key: ${key}`,
-      error,
-    );
-    return defaultValue ?? null;
-  }
-};
-
-export const removeItemFromLS = (key: string): void => {
+function removeClientCookie(name: string): void {
   if (!isClient) return;
+  document.cookie = `${name}=; path=/; max-age=0`;
+}
+
+/**
+ * Read the user profile cookie (not httpOnly — tokens live only in httpOnly cookies).
+ * Access/refresh tokens are never readable from client JS.
+ */
+export const getUserFromCookie = (): UserResponseType | null => {
+  const raw = getCookieValue(COOKIE_USER);
+  if (!raw) return null;
+
   try {
-    localStorage.removeItem(key);
-  } catch (error) {
-    console.error(
-      `Failed to remove item from localStorage with key: ${key}`,
-      error,
-    );
+    return JSON.parse(raw) as UserResponseType;
+  } catch {
+    return null;
   }
 };
 
-// Token management
-export const setAccessTokenToLS = (accessToken: string): void => {
-  setItemToLS(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+/** Clear the non-httpOnly user cookie on the client. Tokens must be cleared via /api/auth/logout. */
+export const clearUserCookie = (): void => {
+  removeClientCookie(COOKIE_USER);
 };
 
-export const getAccessTokenFromLS = (): string => {
-  return getItemFromLS<string>(STORAGE_KEYS.ACCESS_TOKEN, "") || "";
-};
-
-export const setRefreshTokenToLS = (refreshToken: string): void => {
-  setItemToLS(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-};
-
-export const getRefreshTokenFromLS = (): string => {
-  return getItemFromLS<string>(STORAGE_KEYS.REFRESH_TOKEN, "") || "";
-};
-
-// User management
-export const getUserFromLS = (): UserResponseType | null => {
-  return getItemFromLS<UserResponseType>(STORAGE_KEYS.USER);
-};
-
-export const setUserToLS = (user: UserResponseType): void => {
-  setItemToLS(STORAGE_KEYS.USER, user);
-};
-
-// Cookie management
 export const setLocaleCookie = (locale: string): void => {
-  if (!isClient) return;
-  document.cookie = `${COOKIE_LOCALE}=${locale}; path=/; max-age=${COOKIE_LOCALE_MAX_AGE}; SameSite=${COOKIE_LOCALE_SAME_SITE}`;
-};
-
-// Session management
-export const clearLS = (): void => {
-  removeItemFromLS(STORAGE_KEYS.ACCESS_TOKEN);
-  removeItemFromLS(STORAGE_KEYS.REFRESH_TOKEN);
-  removeItemFromLS(STORAGE_KEYS.USER);
+  setClientCookie(
+    COOKIE_LOCALE,
+    locale,
+    COOKIE_LOCALE_MAX_AGE,
+    COOKIE_LOCALE_SAME_SITE,
+  );
 };

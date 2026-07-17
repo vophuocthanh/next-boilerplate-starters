@@ -1,11 +1,21 @@
 {
+  "meta": {
+    "title": "NextJS Boilerplate 2025 — Starter Next.js hiện đại",
+    "description": "Boilerplate Next.js sẵn sàng production với TypeScript, Tailwind CSS, next-intl, TanStack Query và Docker."
+  },
   "hero": {
     "introducing": "NextJS Boilerplate 2025",
     "title": "Boilerplate Hiện Đại cho Ứng Dụng Web Chuyên Nghiệp",
     "description": "Khởi tạo dự án Next.js nhanh chóng với TypeScript, TailwindCSS và các công cụ hiện đại. Xây dựng nhanh hơn, mở rộng thông minh hơn, triển khai mượt mà.",
     "getStarted": "Bắt Đầu Xây Dựng",
     "viewDocs": "Xem Tài Liệu",
-    "github": "Xem trên GitHub"
+    "github": "Xem trên GitHub",
+    "stats": {
+      "fast": "Siêu nhanh",
+      "secure": "Bảo mật",
+      "scalable": "Mở rộng tốt",
+      "openSource": "Mã nguồn mở"
+    }
   },
   "features": {
     "title": "Tính năng nổi bật",
@@ -38,6 +48,10 @@
       }
     }
   },
+  "tech": {
+    "title": "Xây dựng với tech stack hiện đại",
+    "subtitle": "Được hỗ trợ bởi các công cụ và framework hàng đầu"
+  },
   "testimonials": {
     "title": "Khách hàng nói gì về chúng tôi",
     "subtitle": "Khám phá trải nghiệm của những khách hàng đã sử dụng boilerplate của chúng tôi",
@@ -61,7 +75,7 @@
         "company": "GlobalTech"
       },
       "4": {
-        "content": "Next.js 14 kết hợp với TailwindCSS trong boilerplate này tạo ra trải nghiệm phát triển tuyệt vời. Chúng tôi đã giảm 40% thời gian phát triển.",
+        "content": "Next.js kết hợp với TailwindCSS trong boilerplate này tạo ra trải nghiệm phát triển tuyệt vời. Chúng tôi đã giảm 40% thời gian phát triển.",
         "author": "Emily Chen",
         "role": "Trưởng nhóm UI/UX",
         "company": "DesignHub"
@@ -87,6 +101,7 @@
     "careers": "Tuyển dụng",
     "press": "Báo chí",
     "contact": "Liên hệ",
+    "legal": "Pháp lý",
     "termsOfService": "Điều khoản sử dụng",
     "privacyPolicy": "Chính sách bảo mật",
     "cookiePolicy": "Chính sách Cookie",

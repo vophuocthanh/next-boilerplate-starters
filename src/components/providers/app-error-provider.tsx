@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 import { AnimatedBackground } from "@/components/ui/error/animated-background";
 import {
   AnimatedErrorLines,
@@ -48,15 +46,10 @@ export const AppError = ({
           <AnimatedErrorIcon />
           <ErrorContent message={message} title={title} />
 
-          <motion.div
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center gap-4 sm:flex-row"
-            initial={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-          >
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row animate-fade-in animation-delay-200">
             <RetryButton label={retryLabel} onClick={handleReset} />
             <ErrorId digest={safeError.digest} />
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

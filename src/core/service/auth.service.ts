@@ -1,14 +1,8 @@
 import { httpClient } from "@/core/service/http-client";
-import {
-  clearLS,
-  getRefreshTokenFromLS,
-  setAccessTokenToLS,
-  setRefreshTokenToLS,
-  setUserToLS,
-} from "@/core/utils/storage";
+import { clearUserCookie } from "@/core/utils/storage";
 import type {
   Account,
-  LoginResponse,
+  AuthSessionResponse,
   RegisterResponse,
 } from "@/model/interface/auth.interface";
 
@@ -19,17 +13,27 @@ class AuthService {
     return `${this.baseUrl}${path}`;
   }
 
-  async login(params: Account): Promise<LoginResponse> {
-    const data = await httpClient.post<LoginResponse>(
-      this.getEndpoint("/login"),
-      params,
-    );
+  /**
+   * Login goes through a same-origin route so the server can set httpOnly
+   * access/refresh cookies. Tokens never touch client JS storage.
+   */
+  async login(params: Account): Promise<AuthSessionResponse> {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+      credentials: "same-origin",
+    });
 
-    setAccessTokenToLS(data.access_token);
-    setRefreshTokenToLS(data.refresh_token);
-    setUserToLS(data.user);
+    const data = (await response.json().catch(() => ({}))) as
+      | AuthSessionResponse
+      | { message?: string };
 
-    return data;
+    if (!response.ok) {
+      throw new Error((data as { message?: string }).message || "Login failed");
+    }
+
+    return data as AuthSessionResponse;
   }
 
   async register(params: Account): Promise<RegisterResponse> {
@@ -40,16 +44,14 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
-    const refreshToken = getRefreshTokenFromLS();
-
     try {
-      // The server needs the token to revoke it; without it the refresh token
-      // stays valid long after the user believes they signed out.
-      await httpClient.post<void>(this.getEndpoint("/logout"), {
-        refresh_token: refreshToken,
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
       });
     } finally {
-      clearLS();
+      // httpOnly tokens are cleared by the route; drop the client-readable user cookie too.
+      clearUserCookie();
     }
   }
 }
