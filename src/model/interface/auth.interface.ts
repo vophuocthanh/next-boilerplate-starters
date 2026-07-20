@@ -1,16 +1,13 @@
-import { UserResponseType } from "@/model/interface/user.interface";
+import type { AuthSession } from "@/core/types/auth";
 
-/** Raw login payload returned by the upstream API (tokens never leave the server). */
-export interface LoginResponse {
-  user: UserResponseType;
-  access_token: string;
-  refresh_token: string;
-}
+/** Alias used by auth feature / API responses. */
+export type LoginResponse = AuthSession;
 
-/** Client-facing session after login — tokens live in httpOnly cookies only. */
-export interface AuthSessionResponse {
-  user: UserResponseType;
-}
+export type {
+  AuthSession,
+  AuthTokens,
+  RefreshTokenResponse,
+} from "@/core/types/auth";
 
 export interface Account {
   email?: string;

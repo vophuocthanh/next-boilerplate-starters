@@ -3,7 +3,6 @@
 import { Bell, LogOut, Menu, Search, Settings, User } from "lucide-react";
 import { useState } from "react";
 
-import { useRouter } from "@/app/i18n/navigation";
 import { LanguageSwitcher } from "@/components/common/language-switcher";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import {
@@ -14,8 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ROUTE_CONSTANTS } from "@/core/constant/route";
-import { authApi } from "@/core/service/auth.service";
+import { useLogout } from "@/features/auth";
 import { cn } from "@/lib/utils";
 
 import type { DashboardTranslations } from "./types";
@@ -31,17 +29,12 @@ export const HeaderAdmin = ({
   isCollapsed,
   onMobileMenuOpen,
 }: HeaderAdminProps) => {
-  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [hasNotifications] = useState(true);
+  const logout = useLogout();
 
-  const handleLogout = async () => {
-    try {
-      await authApi.logout();
-    } finally {
-      router.push(ROUTE_CONSTANTS.HOME);
-      router.refresh();
-    }
+  const handleLogout = () => {
+    logout.mutate();
   };
 
   return (

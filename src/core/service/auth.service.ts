@@ -1,8 +1,8 @@
 import { httpClient } from "@/core/service/http-client";
-import { clearUserCookie } from "@/core/utils/storage";
+import { clearAuthSession, setAuthSession } from "@/core/utils/storage";
 import type {
   Account,
-  AuthSessionResponse,
+  LoginResponse,
   RegisterResponse,
 } from "@/model/interface/auth.interface";
 
@@ -13,27 +13,13 @@ class AuthService {
     return `${this.baseUrl}${path}`;
   }
 
-  /**
-   * Login goes through a same-origin route so the server can set httpOnly
-   * access/refresh cookies. Tokens never touch client JS storage.
-   */
-  async login(params: Account): Promise<AuthSessionResponse> {
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(params),
-      credentials: "same-origin",
-    });
-
-    const data = (await response.json().catch(() => ({}))) as
-      | AuthSessionResponse
-      | { message?: string };
-
-    if (!response.ok) {
-      throw new Error((data as { message?: string }).message || "Login failed");
-    }
-
-    return data as AuthSessionResponse;
+  async login(params: Account): Promise<LoginResponse> {
+    const data = await httpClient.post<LoginResponse>(
+      this.getEndpoint("/login"),
+      params,
+    );
+    setAuthSession(data);
+    return data;
   }
 
   async register(params: Account): Promise<RegisterResponse> {
@@ -45,13 +31,10 @@ class AuthService {
 
   async logout(): Promise<void> {
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "same-origin",
-      });
+      await httpClient.post(this.getEndpoint("/logout"));
+    } catch {
     } finally {
-      // httpOnly tokens are cleared by the route; drop the client-readable user cookie too.
-      clearUserCookie();
+      clearAuthSession();
     }
   }
 }

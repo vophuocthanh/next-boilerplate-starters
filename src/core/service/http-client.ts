@@ -6,18 +6,28 @@ import type {
 } from "axios";
 import axios, { HttpStatusCode } from "axios";
 
+import {
+  clearAuthSession,
+  getAccessToken,
+  getRefreshToken,
+  setAccessToken,
+  setRefreshToken,
+} from "@/core/utils/storage";
+import type { RefreshTokenResponse } from "@/core/types/auth";
+
 const MAX_RETRY_COUNT = 3;
 const RETRY_BASE_DELAY_MS = 500;
 const TIMEOUT_MS = 10000;
 
 /**
- * Same-origin BFF endpoints.
- * Access/refresh tokens live in httpOnly cookies (set by /api/auth/*).
- * The browser never reads tokens; /api/proxy attaches Authorization server-side.
+ * Same-origin BFF proxy (or direct API base if you change this).
+ * Auth tokens live in localStorage; this client attaches `Authorization: Bearer`.
  */
 const PROXY_BASE_URL = "/api/proxy";
-const AUTH_REFRESH_URL = "/api/auth/refresh";
-const AUTH_LOGOUT_URL = "/api/auth/logout";
+const AUTH_REFRESH_PATH = "/auth/refresh";
+
+/** Paths that must not send the access token / must not trigger token refresh. */
+const AUTH_PUBLIC_PATHS = ["/auth/login", "/auth/register", "/auth/refresh"];
 
 /** Transient failures worth retrying: no response at all, or an overloaded upstream. */
 const RETRYABLE_CODES = ["ECONNABORTED", "ETIMEDOUT", "ERR_NETWORK"];
@@ -66,6 +76,11 @@ type ExtendedInternalAxiosRequestConfig = InternalAxiosRequestConfig & {
 
 const isClient = typeof window !== "undefined";
 
+function isAuthPublicPath(url?: string): boolean {
+  if (!url) return false;
+  return AUTH_PUBLIC_PATHS.some((path) => url.includes(path));
+}
+
 class HttpClient {
   private instance: AxiosInstance;
   private isRefreshing = false;
@@ -75,7 +90,6 @@ class HttpClient {
     this.instance = axios.create({
       baseURL,
       timeout: TIMEOUT_MS,
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
       },
@@ -85,6 +99,16 @@ class HttpClient {
   }
 
   private setupInterceptors(): void {
+    this.instance.interceptors.request.use((config) => {
+      if (isClient && !isAuthPublicPath(config.url)) {
+        const accessToken = getAccessToken();
+        if (accessToken) {
+          config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+      }
+      return config;
+    });
+
     this.instance.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
@@ -122,6 +146,11 @@ class HttpClient {
       return false;
     }
 
+    // Never retry auth bootstrap endpoints.
+    if (isAuthPublicPath(config.url)) {
+      return false;
+    }
+
     const status = error.response?.status;
     return (
       (!!error.code && RETRYABLE_CODES.includes(error.code)) ||
@@ -147,7 +176,12 @@ class HttpClient {
       | ExtendedInternalAxiosRequestConfig
       | undefined;
 
-    if (!originalRequest || originalRequest._retry || !isClient) {
+    if (
+      !originalRequest ||
+      originalRequest._retry ||
+      !isClient ||
+      isAuthPublicPath(originalRequest.url)
+    ) {
       return Promise.reject(error);
     }
 
@@ -161,21 +195,26 @@ class HttpClient {
 
     this.isRefreshing = true;
     try {
-      // Refresh route reads the httpOnly refresh cookie and rotates tokens.
-      const refreshResponse = await fetch(AUTH_REFRESH_URL, {
-        method: "POST",
-        credentials: "same-origin",
-      });
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) {
+        throw new Error("No refresh token");
+      }
 
-      if (!refreshResponse.ok) {
-        throw new Error("Failed to refresh session");
+      const { data } = await this.instance.post<RefreshTokenResponse>(
+        AUTH_REFRESH_PATH,
+        { refreshToken },
+      );
+
+      setAccessToken(data.accessToken);
+      if (data.refreshToken) {
+        setRefreshToken(data.refreshToken);
       }
 
       this.processQueue();
       return this.instance<T>(originalRequest);
     } catch (refreshError) {
       this.processQueue(refreshError);
-      await this.clearSession();
+      this.clearSession();
       return Promise.reject(refreshError);
     } finally {
       this.isRefreshing = false;
@@ -193,15 +232,8 @@ class HttpClient {
     }
   }
 
-  private async clearSession(): Promise<void> {
-    try {
-      await fetch(AUTH_LOGOUT_URL, {
-        method: "POST",
-        credentials: "same-origin",
-      });
-    } catch {
-      // Best-effort; browser may already have cleared cookies on expiry.
-    }
+  private clearSession(): void {
+    clearAuthSession();
   }
 
   private normalizeErrorPayload(data: unknown): HttpErrorPayload {

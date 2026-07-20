@@ -6,6 +6,7 @@ import { type FallbackProps } from "react-error-boundary";
 
 import { AppError } from "@/components/providers/app-error-provider";
 import { ErrorBoundary } from "@/components/providers/error-boundary";
+import ProviderQuery from "@/components/providers/provider-query";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TIME_ZONE } from "@/core/helpers/consts";
 
@@ -15,6 +16,10 @@ type AppProviderProps = {
   messages: Record<string, unknown>;
 };
 
+/**
+ * Root client providers for every locale route.
+ * Single QueryClient lives here so auth / admin / future features share one store.
+ */
 export function AppProvider({ children, locale, messages }: AppProviderProps) {
   const handleError = (error: Error) => {
     console.error("App provider caught an error:", error);
@@ -35,14 +40,15 @@ export function AppProvider({ children, locale, messages }: AppProviderProps) {
   return (
     <ErrorBoundary fallback={renderErrorFallback} onError={handleError}>
       <ThemeProvider>
-        {/* QueryClient lives only under (admin) — public pages don't pay for it. */}
-        <NextIntlClientProvider
-          locale={locale}
-          messages={messages}
-          timeZone={TIME_ZONE}
-        >
-          {children}
-        </NextIntlClientProvider>
+        <ProviderQuery>
+          <NextIntlClientProvider
+            locale={locale}
+            messages={messages}
+            timeZone={TIME_ZONE}
+          >
+            {children}
+          </NextIntlClientProvider>
+        </ProviderQuery>
       </ThemeProvider>
     </ErrorBoundary>
   );

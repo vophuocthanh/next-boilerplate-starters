@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { getLocale } from "next-intl/server";
 
+import { ThemeScript } from "@/components/providers/theme-script";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,7 +46,10 @@ export default async function RootLayout({
     >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-300`}
+        suppressHydrationWarning
       >
+        {/* Server-only FOUC guard — do not put this under a Client Component. */}
+        <ThemeScript />
         {children}
       </body>
     </html>
