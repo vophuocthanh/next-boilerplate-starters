@@ -28,7 +28,6 @@ export function useLogin(options: UseLoginOptions = {}) {
     onSuccess: (data) => {
       onSuccess?.(data);
       router.replace(redirectTo);
-      router.refresh();
     },
     onError: (error) => {
       onError?.(error);

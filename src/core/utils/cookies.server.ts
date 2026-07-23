@@ -43,29 +43,28 @@ export function setAuthCookiesOnResponse(
   response.cookies.set(
     COOKIE_ACCESS_TOKEN,
     tokens.accessToken,
-    baseCookieOptions(COOKIE_ACCESS_TOKEN_MAX_AGE, true),
+    baseCookieOptions(COOKIE_ACCESS_TOKEN_MAX_AGE, false),
   );
   response.cookies.set(
     COOKIE_REFRESH_TOKEN,
     tokens.refreshToken,
-    baseCookieOptions(COOKIE_REFRESH_TOKEN_MAX_AGE, true),
+    baseCookieOptions(COOKIE_REFRESH_TOKEN_MAX_AGE, false),
   );
 
   if (user) {
     response.cookies.set(
       COOKIE_USER,
       JSON.stringify(user),
-      // Readable by the client so UI can show profile without an extra round-trip.
       baseCookieOptions(COOKIE_USER_MAX_AGE, false),
     );
   }
 }
 
 export function clearAuthCookiesOnResponse(response: CookieWritable): void {
-  const expire = baseCookieOptions(0, true);
+  const expire = baseCookieOptions(0, false);
   response.cookies.set(COOKIE_ACCESS_TOKEN, "", expire);
   response.cookies.set(COOKIE_REFRESH_TOKEN, "", expire);
-  response.cookies.set(COOKIE_USER, "", baseCookieOptions(0, false));
+  response.cookies.set(COOKIE_USER, "", expire);
 }
 
 export async function getAccessTokenFromCookies(): Promise<string | undefined> {

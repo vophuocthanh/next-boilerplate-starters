@@ -8,17 +8,17 @@ export const COOKIE_LOCALE_MAX_AGE = 60 * 60 * 24 * 365;
 export const COOKIE_LOCALE_SAME_SITE = "Lax" as const;
 
 /**
- * Client-side auth storage keys (localStorage).
- * Tokens are no longer httpOnly cookies — the browser JS can read them.
+ * Auth cookie names (client-readable — API dùng Bearer header cross-origin,
+ * nên JS cần đọc được token để gắn Authorization).
  */
-export const STORAGE_ACCESS_TOKEN = "accessToken";
-export const STORAGE_REFRESH_TOKEN = "refreshToken";
-export const STORAGE_USER = "user";
+export const COOKIE_ACCESS_TOKEN = "accessToken";
+export const COOKIE_REFRESH_TOKEN = "refreshToken";
+export const COOKIE_USER = "user";
 
-/** @deprecated Prefer STORAGE_* keys — kept for server cookie helpers if re-enabled. */
-export const COOKIE_ACCESS_TOKEN = STORAGE_ACCESS_TOKEN;
-export const COOKIE_REFRESH_TOKEN = STORAGE_REFRESH_TOKEN;
-export const COOKIE_USER = STORAGE_USER;
+/** @deprecated Alias — dùng COOKIE_* */
+export const STORAGE_ACCESS_TOKEN = COOKIE_ACCESS_TOKEN;
+export const STORAGE_REFRESH_TOKEN = COOKIE_REFRESH_TOKEN;
+export const STORAGE_USER = COOKIE_USER;
 
 /** Access token lifetime (15 minutes). */
 export const COOKIE_ACCESS_TOKEN_MAX_AGE = 60 * 15;
@@ -27,5 +27,6 @@ export const COOKIE_REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 /** User profile lifetime (aligned with refresh). */
 export const COOKIE_USER_MAX_AGE = COOKIE_REFRESH_TOKEN_MAX_AGE;
 
+/** lowercase cho Next.js ResponseCookie; document.cookie chấp nhận cả hai. */
 export const COOKIE_AUTH_SAME_SITE = "lax" as const;
 export const COOKIE_AUTH_PATH = "/";

@@ -27,19 +27,21 @@ describe("storage utils", () => {
     clearAllCookies();
   });
 
-  describe("auth session (localStorage)", () => {
+  describe("auth session (cookies)", () => {
     const session = {
       user: { id: "u1", email: "a@b.com", name: "An", role: "admin" },
       accessToken: "access-abc",
       refreshToken: "refresh-xyz",
     };
 
-    it("lưu và đọc access / refresh token + user", () => {
+    it("lưu và đọc access / refresh token + user từ cookie", () => {
       setAuthSession(session);
 
       expect(getAccessToken()).toBe("access-abc");
       expect(getRefreshToken()).toBe("refresh-xyz");
       expect(getUserFromStorage()).toEqual(session.user);
+      expect(document.cookie).toContain("accessToken=");
+      expect(document.cookie).toContain("refreshToken=");
     });
 
     it("trả về null khi chưa có session", () => {
@@ -49,17 +51,25 @@ describe("storage utils", () => {
     });
 
     it("trả về null khi user JSON không hợp lệ", () => {
-      localStorage.setItem("user", "not-json{");
+      document.cookie = `user=${encodeURIComponent("not-json{")}; path=/`;
       expect(getUserFromStorage()).toBeNull();
     });
 
-    it("xoá toàn bộ session phía client", () => {
+    it("xoá toàn bộ session cookie", () => {
       setAuthSession(session);
       clearAuthSession();
 
       expect(getAccessToken()).toBeNull();
       expect(getRefreshToken()).toBeNull();
       expect(getUserFromStorage()).toBeNull();
+    });
+
+    it("dọn localStorage legacy khi set session", () => {
+      localStorage.setItem("accessToken", "legacy");
+      localStorage.setItem("refreshToken", "legacy");
+      setAuthSession(session);
+      expect(localStorage.getItem("accessToken")).toBeNull();
+      expect(localStorage.getItem("refreshToken")).toBeNull();
     });
   });
 

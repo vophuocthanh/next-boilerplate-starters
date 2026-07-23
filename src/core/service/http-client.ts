@@ -14,20 +14,30 @@ import {
   setRefreshToken,
 } from "@/core/utils/storage";
 import type { RefreshTokenResponse } from "@/core/types/auth";
+import { ROUTE_CONSTANTS } from "@/core/constant/route";
 
 const MAX_RETRY_COUNT = 3;
 const RETRY_BASE_DELAY_MS = 500;
 const TIMEOUT_MS = 10000;
 
 /**
- * Same-origin BFF proxy (or direct API base if you change this).
- * Auth tokens live in localStorage; this client attaches `Authorization: Bearer`.
+ * Gọi thẳng backend qua NEXT_PUBLIC_API_URL (vd: http://localhost:4040/api).
+ * Auth tokens nằm cookie; client đọc và gắn Authorization: Bearer.
  */
-const PROXY_BASE_URL = "/api/proxy";
-const AUTH_REFRESH_PATH = "/auth/refresh";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "/api";
+const AUTH_REFRESH_PATH = "/auth/refresh-token";
 
 /** Paths that must not send the access token / must not trigger token refresh. */
-const AUTH_PUBLIC_PATHS = ["/auth/login", "/auth/register", "/auth/refresh"];
+const AUTH_PUBLIC_PATHS = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/refresh-token",
+  "/auth/verify-email",
+  "/auth/resend-verification-email",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+];
 
 /** Transient failures worth retrying: no response at all, or an overloaded upstream. */
 const RETRYABLE_CODES = ["ECONNABORTED", "ETIMEDOUT", "ERR_NETWORK"];
@@ -86,7 +96,7 @@ class HttpClient {
   private isRefreshing = false;
   private refreshQueue: RefreshTokenQueueItem[] = [];
 
-  constructor(baseURL: string = PROXY_BASE_URL) {
+  constructor(baseURL: string = API_BASE_URL) {
     this.instance = axios.create({
       baseURL,
       timeout: TIMEOUT_MS,
@@ -200,14 +210,22 @@ class HttpClient {
         throw new Error("No refresh token");
       }
 
-      const { data } = await this.instance.post<RefreshTokenResponse>(
-        AUTH_REFRESH_PATH,
-        { refreshToken },
-      );
+      const { data: envelope } = await this.instance.post<
+        RefreshTokenResponse | { data: RefreshTokenResponse }
+      >(AUTH_REFRESH_PATH, { refreshToken });
 
-      setAccessToken(data.accessToken);
-      if (data.refreshToken) {
-        setRefreshToken(data.refreshToken);
+      // Backend bọc response qua TransformInterceptor: { statusCode, data }.
+      const tokens =
+        envelope &&
+        typeof envelope === "object" &&
+        "data" in envelope &&
+        envelope.data
+          ? envelope.data
+          : (envelope as RefreshTokenResponse);
+
+      setAccessToken(tokens.accessToken);
+      if (tokens.refreshToken) {
+        setRefreshToken(tokens.refreshToken);
       }
 
       this.processQueue();
@@ -234,6 +252,20 @@ class HttpClient {
 
   private clearSession(): void {
     clearAuthSession();
+    // Session hết hạn / refresh fail: đưa user về sign-in (full navigation).
+    if (isClient) {
+      const path = window.location.pathname;
+      const onAuthPage =
+        path.includes(ROUTE_CONSTANTS.SIGN_IN) ||
+        path.includes(ROUTE_CONSTANTS.SIGN_UP) ||
+        path.includes(ROUTE_CONSTANTS.VERIFY_EMAIL) ||
+        path.includes(ROUTE_CONSTANTS.FORGOT_PASSWORD);
+      if (!onAuthPage) {
+        const localeMatch = path.match(/^\/(vi|en)(?=\/|$)/);
+        const locale = localeMatch?.[1] ?? "vi";
+        window.location.assign(`/${locale}${ROUTE_CONSTANTS.SIGN_IN}`);
+      }
+    }
   }
 
   private normalizeErrorPayload(data: unknown): HttpErrorPayload {
