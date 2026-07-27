@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { getLocale } from "next-intl/server";
 
 import { ThemeScript } from "@/components/providers/theme-script";
+import { SITE_URL } from "@/core/configs/env";
 
 import "./globals.css";
 
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   description:
     "Production-ready Next.js boilerplate with TypeScript, Tailwind CSS, next-intl, and Docker.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:4040",
+    SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:4040",
   ),
 };
 

@@ -13,13 +13,19 @@ type ErrorBoundaryProps = {
   onError?: (error: Error, info: ErrorInfo) => void;
 };
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export function ErrorBoundary({
   children,
   fallback,
   onError,
 }: ErrorBoundaryProps) {
   const handleError = (error: Error, info: ErrorInfo) => {
-    console.error("ErrorBoundary caught an error:", error, info);
+    if (isProduction) {
+      console.error("ErrorBoundary caught an error:", error.name);
+    } else {
+      console.error("ErrorBoundary caught an error:", error, info);
+    }
     onError?.(error, info);
   };
 

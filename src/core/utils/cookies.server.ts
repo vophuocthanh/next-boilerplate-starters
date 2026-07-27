@@ -11,6 +11,8 @@ import {
   COOKIE_USER,
   COOKIE_USER_MAX_AGE,
 } from "@/core/helpers/consts";
+import { toSafeUser } from "@/core/helpers/safe-user";
+import type { SafeUserCookie } from "@/core/helpers/safe-user";
 import type { UserResponseType } from "@/model/interface/user.interface";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -54,7 +56,7 @@ export function setAuthCookiesOnResponse(
   if (user) {
     response.cookies.set(
       COOKIE_USER,
-      JSON.stringify(user),
+      JSON.stringify(toSafeUser(user)),
       baseCookieOptions(COOKIE_USER_MAX_AGE, false),
     );
   }
@@ -79,13 +81,13 @@ export async function getRefreshTokenFromCookies(): Promise<
   return store.get(COOKIE_REFRESH_TOKEN)?.value;
 }
 
-export async function getUserFromCookies(): Promise<UserResponseType | null> {
+export async function getUserFromCookies(): Promise<SafeUserCookie | null> {
   const store = await cookies();
   const raw = store.get(COOKIE_USER)?.value;
   if (!raw) return null;
 
   try {
-    return JSON.parse(raw) as UserResponseType;
+    return JSON.parse(raw) as SafeUserCookie;
   } catch {
     return null;
   }

@@ -1,6 +1,8 @@
 {
   "title": "Error: {errorName}",
   "message": "Error details: {errorMessage}\n\nPlease try refreshing the page or come back later.",
+  "genericTitle": "An unexpected error occurred",
+  "genericMessage": "Sorry, something went wrong. Please try refreshing the page or come back later.",
   "retry": "Try again",
   "titleView": "An error occurred",
   "messageView": "Sorry, an error occurred while processing your request. Please try again later.",

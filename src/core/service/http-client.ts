@@ -13,6 +13,7 @@ import {
   setAccessToken,
   setRefreshToken,
 } from "@/core/utils/storage";
+import { getCsrfHeaders } from "@/core/helpers/csrf";
 import type { RefreshTokenResponse } from "@/core/types/auth";
 import { ROUTE_CONSTANTS } from "@/core/constant/route";
 
@@ -115,6 +116,8 @@ class HttpClient {
         if (accessToken) {
           config.headers.Authorization = `Bearer ${accessToken}`;
         }
+        // Attach CSRF token for defense-in-depth (server must validate).
+        Object.assign(config.headers, getCsrfHeaders());
       }
       return config;
     });

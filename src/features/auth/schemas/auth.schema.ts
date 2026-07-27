@@ -9,6 +9,7 @@ export const AUTH_VALIDATION = {
   PASSWORD_MIN: 8,
   PASSWORD_MAX: 72,
   PHONE_PATTERN: REGEX.PHONE,
+  PASSWORD_COMPLEXITY: REGEX.PASSWORD_COMPLEXITY,
 } as const;
 
 /** Message keys resolved via `auth.validation.*` in dictionaries. */
@@ -18,6 +19,7 @@ export const AUTH_ERROR_KEYS = {
   INVALID_PHONE: "invalidPhone",
   NAME_MIN: "nameMin",
   PASSWORD_MIN: "passwordMin",
+  PASSWORD_COMPLEXITY: "passwordComplexity",
   PASSWORD_MISMATCH: "passwordMismatch",
   ACCEPT_TERMS: "acceptTerms",
 } as const;
@@ -35,7 +37,10 @@ const passwordSchema = requiredString
   .min(AUTH_VALIDATION.PASSWORD_MIN, {
     message: AUTH_ERROR_KEYS.PASSWORD_MIN,
   })
-  .max(AUTH_VALIDATION.PASSWORD_MAX);
+  .max(AUTH_VALIDATION.PASSWORD_MAX)
+  .regex(AUTH_VALIDATION.PASSWORD_COMPLEXITY, {
+    message: AUTH_ERROR_KEYS.PASSWORD_COMPLEXITY,
+  });
 
 const optionalPhoneSchema = z
   .string()

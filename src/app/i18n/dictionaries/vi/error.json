@@ -1,6 +1,8 @@
 {
   "title": "Lỗi: {errorName}",
   "message": "Chi tiết lỗi: {errorMessage}\n\nVui lòng thử làm mới trang hoặc quay lại sau.",
+  "genericTitle": "Đã xảy ra lỗi không mong muốn",
+  "genericMessage": "Rất tiếc, đã có lỗi xảy ra. Vui lòng thử làm mới trang hoặc quay lại sau.",
   "retry": "Thử lại",
   "titleView": "Đã xảy ra lỗi",
   "messageView": "Rất tiếc, đã xảy ra lỗi khi xử lý yêu cầu của bạn.",

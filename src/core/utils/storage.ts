@@ -11,14 +11,15 @@ import {
   COOKIE_USER,
   COOKIE_USER_MAX_AGE,
 } from "@/core/helpers/consts";
+import { toSafeUser } from "@/core/helpers/safe-user";
+import type { SafeUserCookie } from "@/core/helpers/safe-user";
 import type { AuthSession } from "@/core/types/auth";
-import type { UserResponseType } from "@/model/interface/user.interface";
 
 const isClient = typeof window !== "undefined";
-const isSecure =
-  isClient &&
-  (window.location.protocol === "https:" ||
-    process.env.NODE_ENV === "production");
+
+const isSecure = isClient
+  ? window.location.protocol === "https:"
+  : process.env.NODE_ENV === "production";
 
 /** Cho phép UI subscribe khi session đổi (cùng tab). */
 const AUTH_CHANGE_EVENT = "auth-session-change";
@@ -120,12 +121,12 @@ export const getAccessToken = (): string | null =>
 export const getRefreshToken = (): string | null =>
   normalizeCookieValue(getCookieValue(COOKIE_REFRESH_TOKEN));
 
-export const getUserFromStorage = (): UserResponseType | null => {
+export const getUserFromStorage = (): SafeUserCookie | null => {
   const raw = getCookieValue(COOKIE_USER);
   if (!raw) return null;
 
   try {
-    return JSON.parse(raw) as UserResponseType;
+    return JSON.parse(raw) as SafeUserCookie;
   } catch {
     return null;
   }
@@ -155,7 +156,7 @@ export const setAuthSession = (session: AuthSession): void => {
   );
   setClientCookie(
     COOKIE_USER,
-    JSON.stringify(session.user ?? null),
+    JSON.stringify(session.user ? toSafeUser(session.user) : null),
     COOKIE_USER_MAX_AGE,
   );
   notifyAuthChange();

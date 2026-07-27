@@ -2,6 +2,8 @@
 
 import { AppError } from "@/components/providers/app-error-provider";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 /**
  * `global-error` replaces the root layout, so it renders outside every provider
  * — including NextIntlClientProvider. Calling a next-intl hook here throws and
@@ -16,8 +18,10 @@ export default function GlobalError({
   reset: () => void;
 }) {
   const errorName = error?.name || "Error";
-  const errorMessage = error?.message || "Unknown error";
-  const title = `System error: ${errorName}`;
+  const errorMessage = isProduction
+    ? "An unexpected error occurred."
+    : error?.message || "Unknown error";
+  const title = `System error: ${isProduction ? "Unexpected Error" : errorName}`;
 
   return (
     <html lang="en">
