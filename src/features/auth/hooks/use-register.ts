@@ -17,10 +17,6 @@ type UseRegisterOptions = {
   onError?: (error: Error) => void;
 };
 
-/**
- * Register mutation — API lives in the feature layer, not in page UI.
- * On success: navigate to sign-in.
- */
 export function useRegister(options: UseRegisterOptions = {}) {
   const router = useRouter();
   const lastAttemptRef = useRef(0);
