@@ -1,7 +1,9 @@
 import { Linkedin, Github, Mail, Twitter } from "lucide-react";
 
+import { EXTERNAL_LINKS } from "@/core/constant/links";
+
 export const socialLinks = [
-  { icon: Github, href: "#", label: "GitHub" },
+  { icon: Github, href: EXTERNAL_LINKS.GITHUB_REPO, label: "GitHub" },
   { icon: Twitter, href: "#", label: "Twitter" },
   { icon: Linkedin, href: "#", label: "LinkedIn" },
   { icon: Mail, href: "#", label: "Email" },

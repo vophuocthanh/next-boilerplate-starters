@@ -2,6 +2,7 @@ import { Github, Zap, Shield, Rocket } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
+import { EXTERNAL_LINKS } from "@/core/constant/links";
 
 export async function HeroSection() {
   const t = await getTranslations("landing.hero");
@@ -55,12 +56,19 @@ export async function HeroSection() {
             </Button>
 
             <Button
+              asChild
               size="lg"
               variant="outline"
               className="px-8 py-6 text-lg font-semibold border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 backdrop-blur-sm"
             >
-              <Github className="w-5 h-5 mr-2" />
-              {t("github")}
+              <a
+                href={EXTERNAL_LINKS.GITHUB_REPO}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="w-5 h-5 mr-2" />
+                {t("github")}
+              </a>
             </Button>
           </div>
 

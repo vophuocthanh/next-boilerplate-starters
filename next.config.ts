@@ -36,7 +36,7 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       `connect-src 'self' ${API_ORIGIN}`,
-      "script-src 'self' 'unsafe-inline'",
+      `script-src 'self' 'unsafe-inline'${isProduction ? "" : " 'unsafe-eval'"}`,
       // style-src needs unsafe-inline for CSS-in-JS / Tailwind
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
